@@ -53,9 +53,12 @@ class _HomepageState extends State<Homepage> {
         child: BottomNavigationBar(
           unselectedItemColor: Colors.white,
           selectedItemColor: const Color.fromARGB(255, 71, 186, 253),
+
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
           unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+
           backgroundColor: Colors.grey[800],
+          
           currentIndex: currentPage,
           onTap: (value) {
             setState(() {

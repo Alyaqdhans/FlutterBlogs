@@ -1,15 +1,22 @@
 import 'package:blogs/homepage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
+  await dotenv.load(fileName: "../.env");
+  String? apikey = dotenv.env['API_KEY'];
+  String? appId = dotenv.env['APP_ID'];
+  String? messagingSenderId = dotenv.env['MESSAGING_SENDER_ID'];
+  String? projectId = dotenv.env['PROJECT_ID'];
+
   WidgetsFlutterBinding.ensureInitialized();
   Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: "AIzaSyAiavt0nVOycGQRZQiv0faNhHd11DILytg",
-      appId: "1:776364872459:android:17a59ab37697c5927ac80e",
-      messagingSenderId: "776364872459",
-      projectId: "flutterblogs-2f978"
+    options: FirebaseOptions(
+      apiKey: apikey!,
+      appId: appId!,
+      messagingSenderId: messagingSenderId!,
+      projectId: projectId!
     )
   );
 
@@ -28,6 +35,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
+    // login page
     return const Homepage();
   }
 }
