@@ -1,4 +1,4 @@
-import 'package:blogs/homepage.dart';
+import 'package:blogs/login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -35,7 +35,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
-    // login page
-    return const Homepage();
+    return const Login();
   }
 }

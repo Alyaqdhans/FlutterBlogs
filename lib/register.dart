@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-class Create extends StatefulWidget {
-  const Create({super.key});
+class Register extends StatefulWidget {
+  const Register({super.key});
 
   @override
-  State<Create> createState() => _CreateState();
+  State<Register> createState() => _RegisterState();
 }
 
-class _CreateState extends State<Create> {
+class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Blog'),
+        title: const Text('Register'),
         centerTitle: true,
         backgroundColor: Colors.grey[800],
         foregroundColor: Colors.white,
