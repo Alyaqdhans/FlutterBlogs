@@ -1,3 +1,4 @@
+import 'package:blogs/homepage.dart';
 import 'package:blogs/register.dart';
 import 'package:flutter/material.dart';
 
@@ -24,19 +25,42 @@ class _LoginState extends State<Login> {
         foregroundColor: Colors.white,
       ),
 
-      body: Column(
+      body: ListView(
         children: [
-          const ClipRRect(
-            borderRadius: BorderRadius.only(                                           
-              bottomLeft: Radius.circular(75),
-              bottomRight: Radius.circular(75),
-            ),
-            child: Image(
-              image: AssetImage("assets/media.png"),
-              opacity: AlwaysStoppedAnimation(0.5)
-            )
-          ),
+          Stack(
+            alignment: AlignmentDirectional.center,
+            children: [
+              Card(
+                elevation: 5,
+                margin: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(75)),
+                child: const ClipRRect(
+                  borderRadius: BorderRadius.only(                                           
+                    bottomLeft: Radius.circular(75),
+                    bottomRight: Radius.circular(75),
+                  ),
+                  child: Image(
+                    image: AssetImage("assets/media.png"),
+                    opacity: AlwaysStoppedAnimation(0.5),
+                  ),
+                ),
+              ),
 
+              const Text(
+                'UTAS\n  BLOGS',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 75,
+                  color: Colors.white,
+                  shadows: [
+                    // Shadow(color: Colors.white, offset: Offset(14, 14)),
+                    Shadow(color: Colors.black, offset: Offset(7, 7)),
+                  ]
+                ),
+              ),
+            ],
+          ),
+          
           const SizedBox(height: 30),
           
           Container(
@@ -49,7 +73,7 @@ class _LoginState extends State<Login> {
                   children: [
                     ListTile(
                       title: Text(
-                        'Explore the app?',
+                        'Explore',
                         style: TextStyle(
                           color: Colors.grey[800],
                         ),
@@ -57,9 +81,14 @@ class _LoginState extends State<Login> {
                     ),
 
                     ListTile(
-                      title: Container(
+                      title: SizedBox(
                         height: 45,
                         child: FloatingActionButton.extended(
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            side: const BorderSide(color: Colors.grey)
+                          ),
                           backgroundColor: Colors.white,
                           icon: Icon(
                             Icons.person,
@@ -74,7 +103,15 @@ class _LoginState extends State<Login> {
                               color: Colors.grey[800]
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) {
+                                return const Homepage();
+                              })
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -82,7 +119,7 @@ class _LoginState extends State<Login> {
                     const SizedBox(height: 20),
 
                     Divider(
-                      color: Colors.grey[800],
+                      color: Colors.grey[600],
                       thickness: 3,
                     ),
 
@@ -92,8 +129,7 @@ class _LoginState extends State<Login> {
                       title: Text(
                         'Login',
                         style: TextStyle(
-                          color: Colors.grey[800],
-                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[800]
                         ),
                       ),
                     ),
@@ -108,6 +144,8 @@ class _LoginState extends State<Login> {
                         ),
                       ),
                     ),
+
+                    const SizedBox(height: 10),
                     
                     Stack(
                       alignment: AlignmentDirectional.centerEnd,
@@ -132,29 +170,29 @@ class _LoginState extends State<Login> {
                                 hidePassword = !hidePassword;
                               });
                             },
-                            icon: Icon(hidePassword ? Icons.visibility_off : Icons.visibility)
+                            icon: Icon((hidePassword ? Icons.visibility_off : Icons.visibility), color: Colors.blue)
                           ),
                         ),
                       ]
                     ),
+
+                    const SizedBox(height: 10),
                     
                     ListTile(
                       title: SizedBox(
                         height: 40,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
-                          ),
-                          child: const Text(
+                        child: FloatingActionButton.extended(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          label: const Text(
                             'Login',
                             style: TextStyle(
-                              color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 20
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            
+                          },
                         ),
                       ),
                     ),
@@ -175,13 +213,11 @@ class _LoginState extends State<Login> {
 
                           OutlinedButton(
                             style: OutlinedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                             child: const Text(
                               'Register',
                               style: TextStyle(
-                                color: Colors.blue,
                                 fontWeight: FontWeight.bold
                               ),
                             ),

@@ -29,8 +29,6 @@ class _HomepageState extends State<Homepage> {
         height: 75,
         child: FloatingActionButton(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
           onPressed: () {
             setState(() {
               Navigator.push(
@@ -55,7 +53,6 @@ class _HomepageState extends State<Homepage> {
           selectedItemColor: const Color.fromARGB(255, 71, 186, 253),
 
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
 
           backgroundColor: Colors.grey[800],
           
@@ -65,13 +62,13 @@ class _HomepageState extends State<Homepage> {
               currentPage = value;
             });
           },
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home, size: 30),
+              icon: Icon((currentPage == 0 ? Icons.home : Icons.home_outlined), size: 30),
               label: "Home"
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person, size: 30),
+              icon: Icon((currentPage == 1 ? Icons.person : Icons.person_outlined), size: 30),
               label: "Profile"
             ),
           ],

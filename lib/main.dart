@@ -20,8 +20,11 @@ void main() async {
     )
   );
 
-  runApp(const MaterialApp(
-    home: Home(),
+  runApp(MaterialApp(
+    home: const Home(),
+    theme: ThemeData(
+      useMaterial3: false,
+    ),
   ));
 }
 
