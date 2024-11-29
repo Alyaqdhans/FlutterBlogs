@@ -1,5 +1,6 @@
 import 'package:blogs/homepage.dart';
 import 'package:blogs/register.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -14,6 +15,55 @@ class _LoginState extends State<Login> {
   final TextEditingController _password = TextEditingController();
 
   bool hidePassword = true;
+
+  Future login() async{
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _email.text.trim(),
+        password: _password.text.trim()
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(  
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          dismissDirection: DismissDirection.horizontal,
+          backgroundColor: Colors.green,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          content: const Row(
+            children: [
+              Icon(Icons.check, color: Colors.white, size: 30),
+              SizedBox(width: 10),
+              Text('Logged in successfully!', style: TextStyle(color: Colors.white, fontSize: 18)),
+            ],
+          ),
+        )
+      );
+
+      Navigator.pop(context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) {
+          return const Homepage();
+        })
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          dismissDirection: DismissDirection.horizontal,
+          backgroundColor: Colors.red,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          content: Row(
+            children: [
+              const Icon(Icons.close, color: Colors.white, size: 30),
+              const SizedBox(width: 10),
+              Flexible(child: Text(error.toString(), style: const TextStyle(color: Colors.white, fontSize: 18))),
+            ],
+          ),
+        )
+      );
+    }
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -41,7 +91,7 @@ class _LoginState extends State<Login> {
                   ),
                   child: Image(
                     image: AssetImage("assets/media.png"),
-                    opacity: AlwaysStoppedAnimation(0.5),
+                    opacity: AlwaysStoppedAnimation(0.4),
                   ),
                 ),
               ),
@@ -66,7 +116,7 @@ class _LoginState extends State<Login> {
           Container(
             padding: const EdgeInsets.all(20),
             child: Card(
-              surfaceTintColor: Colors.grey,
+              elevation: 3,
               child: Container(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -180,18 +230,18 @@ class _LoginState extends State<Login> {
                     
                     ListTile(
                       title: SizedBox(
-                        height: 40,
+                        height: 45,
                         child: FloatingActionButton.extended(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           label: const Text(
-                            'Login',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20
+                              'Login',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20
+                              ),
                             ),
-                          ),
                           onPressed: () {
-                            
+                            login();
                           },
                         ),
                       ),
@@ -213,6 +263,7 @@ class _LoginState extends State<Login> {
 
                           OutlinedButton(
                             style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                             child: const Text(
