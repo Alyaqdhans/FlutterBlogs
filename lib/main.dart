@@ -12,13 +12,11 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   Firebase.initializeApp(
-    options: FirebaseOptions(
-      apiKey: apikey!,
-      appId: appId!,
-      messagingSenderId: messagingSenderId!,
-      projectId: projectId!
-    )
-  );
+      options: FirebaseOptions(
+          apiKey: apikey!,
+          appId: appId!,
+          messagingSenderId: messagingSenderId!,
+          projectId: projectId!));
 
   runApp(MaterialApp(
     home: const Home(),
