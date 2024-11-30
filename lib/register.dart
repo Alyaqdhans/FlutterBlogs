@@ -247,53 +247,33 @@ class _RegisterState extends State<Register> {
 
                     const SizedBox(height: 10),
 
-                    Stack(
-                      alignment: AlignmentDirectional.centerEnd,
-                      children: [
-                        ListTile(
-                          title: TextFormField(
-                            readOnly: true,
-                            controller: _birthday,
-                            decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.cake),
-                              labelText: 'Birthday',
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-                            ),
-                            onTap: () async{
-                              DateTime? _selected = await showDatePicker(
-                                context: context,
-                                firstDate: DateTime.utc(1900),
-                                lastDate: DateTime.utc(2100)
-                              );
-                          
-                              if (_selected != null) {
-                                setState(() {
-                                  _birthday.text = DateFormat('d/M/y').format(_selected).toString();
-                                });
-                              }
-                            },
-                          ),
+                    ListTile(
+                      title: TextFormField(
+                        readOnly: true,
+                        controller: _birthday,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.cake),
+                          labelText: 'Birthday',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                         ),
-
-                        (_birthday.text == "") ? (Container()) :
-                        (
-                          Container(
-                            alignment: const Alignment(0.85, 0),
-                            child: Focus(
-                              descendantsAreFocusable: false,
-                              canRequestFocus: false,
-                              child: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _birthday.text = "";
-                                  });
-                                },
-                                icon: const Icon(Icons.clear, color: Colors.blue)
-                              ),
-                            ),
-                          )
-                        ),
-                      ],
+                        onTap: () async{
+                          DateTime? _selected = await showDatePicker(
+                            context: context,
+                            firstDate: DateTime.utc(1900),
+                            lastDate: DateTime.utc(2100)
+                          );
+                      
+                          if (_selected != null) {
+                            setState(() {
+                              _birthday.text = DateFormat('d/M/y').format(_selected).toString();
+                            });
+                          } else {
+                            setState(() {
+                              _birthday.text = "";
+                            });
+                          }
+                        },
+                      ),
                     ),
 
                     const SizedBox(height: 10),
