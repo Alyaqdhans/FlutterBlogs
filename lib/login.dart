@@ -46,7 +46,7 @@ class _LoginState extends State<Login> {
           return const Homepage();
         })
       );
-    } catch (error) {
+    } catch(error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
@@ -57,7 +57,7 @@ class _LoginState extends State<Login> {
             children: [
               const Icon(Icons.close, color: Colors.white, size: 30),
               const SizedBox(width: 10),
-              Flexible(child: Text(error.toString(), style: const TextStyle(color: Colors.white, fontSize: 18))),
+              Flexible(child: Text(error.toString().replaceAll(RegExp('\\[.+\\]'), '').trim(), style: const TextStyle(color: Colors.white, fontSize: 18))),
             ],
           ),
         )
@@ -77,26 +77,35 @@ class _LoginState extends State<Login> {
 
       body: ListView(
         children: [
-          Stack(
+          const Stack(
             alignment: AlignmentDirectional.center,
             children: [
-              Card(
-                elevation: 5,
-                margin: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(75)),
-                child: const ClipRRect(
-                  borderRadius: BorderRadius.only(                                           
-                    bottomLeft: Radius.circular(75),
-                    bottomRight: Radius.circular(75),
+              SizedBox(
+                height: 350,
+                child: Card(
+                  elevation: 5,
+                  margin: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(                                           
+                      bottomLeft: Radius.circular(75),
+                      bottomRight: Radius.circular(75),
+                    ),
                   ),
-                  child: Image(
-                    image: AssetImage("assets/media.png"),
-                    opacity: AlwaysStoppedAnimation(0.4),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.only(                                           
+                      bottomLeft: Radius.circular(75),
+                      bottomRight: Radius.circular(75),
+                    ),
+                    child: Image(
+                      image: AssetImage("assets/media.png"),
+                      opacity: AlwaysStoppedAnimation(0.4),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
 
-              const Text(
+              Text(
                 'UTAS\n  BLOGS',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -111,12 +120,13 @@ class _LoginState extends State<Login> {
             ],
           ),
           
-          const SizedBox(height: 30),
+          const SizedBox(height: 10),
           
           Container(
             padding: const EdgeInsets.all(20),
             child: Card(
               elevation: 3,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
               child: Container(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -214,13 +224,17 @@ class _LoginState extends State<Login> {
 
                         Container(
                           alignment: const Alignment(0.85, 0),
-                          child: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                hidePassword = !hidePassword;
-                              });
-                            },
-                            icon: Icon((hidePassword ? Icons.visibility_off : Icons.visibility), color: Colors.blue)
+                          child: Focus(
+                            descendantsAreFocusable: false,
+                            canRequestFocus: false,
+                            child: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  hidePassword = !hidePassword;
+                                });
+                              },
+                              icon: Icon((hidePassword ? Icons.visibility_off : Icons.visibility), color: Colors.blue)
+                            ),
                           ),
                         ),
                       ]
@@ -232,7 +246,7 @@ class _LoginState extends State<Login> {
                       title: SizedBox(
                         height: 45,
                         child: FloatingActionButton.extended(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                           label: const Text(
                               'Login',
                               style: TextStyle(
