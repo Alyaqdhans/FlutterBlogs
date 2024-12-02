@@ -1,4 +1,4 @@
-import 'package:blogs/function/message.dart';
+import 'package:blogs/function/library.dart';
 import 'package:blogs/widgets/heroform.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,7 +13,7 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  Message msg = Message();
+  CustomLibrary msg = CustomLibrary();
 
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();

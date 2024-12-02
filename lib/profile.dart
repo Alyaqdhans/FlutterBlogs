@@ -1,4 +1,4 @@
-import 'package:blogs/function/message.dart';
+import 'package:blogs/function/library.dart';
 import 'package:blogs/homepage.dart';
 import 'package:blogs/widgets/heroform.dart';
 import 'package:blogs/widgets/loginform.dart';
@@ -15,7 +15,7 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  Message msg = Message();
+  CustomLibrary msg = CustomLibrary();
   User? user = FirebaseAuth.instance.currentUser;
 
   final TextEditingController _email = TextEditingController();
@@ -252,23 +252,12 @@ class _ProfileState extends State<Profile> {
                                     ),
                                   ),
                                 onPressed: () async {
-                                  final result = await showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('Are you sure you want to reset?'),
-                                      content: const Text('You will receive an email on the registered account.'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(context, false),
-                                          child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold))
-                                        ),
-
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(context, true),
-                                          child: const Text('Reset', style: TextStyle(fontWeight: FontWeight.bold))
-                                        ),
-                                      ],
-                                    )
+                                  final result = await msg.showBottomAction(
+                                    context,
+                                    'Are you sure you want to reset?',
+                                    'You will receive an email on the registered account.',
+                                    'Reset',
+                                    Colors.orange[600]
                                   );
 
                                   if (result == true) reset();
@@ -293,23 +282,12 @@ class _ProfileState extends State<Profile> {
                                     ),
                                   ),
                                 onPressed: () async {
-                                  final result = await showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('Are you sure you want to logout?'),
-                                      content: const Text('You will be logged out from current account.'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(context, false),
-                                          child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold))
-                                        ),
-                                    
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(context, true),
-                                          child: const Text('Logout', style: TextStyle(fontWeight: FontWeight.bold))
-                                        ),
-                                      ],
-                                    )
+                                  final result = await msg.showBottomAction(
+                                    context,
+                                    'Are you sure you want to logout?',
+                                    'You will be logged out from current account.',
+                                    'Logout',
+                                    Colors.redAccent
                                   );
 
                                   if (result == true) logout();

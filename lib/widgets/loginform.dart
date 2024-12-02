@@ -1,4 +1,4 @@
-import 'package:blogs/function/message.dart';
+import 'package:blogs/function/library.dart';
 import 'package:blogs/homepage.dart';
 import 'package:blogs/register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,7 +12,7 @@ class Loginform extends StatefulWidget {
 }
 
 class _LoginformState extends State<Loginform> {
-  Message msg = Message(); // custom notification handler
+  CustomLibrary msg = CustomLibrary();
 
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();

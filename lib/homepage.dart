@@ -49,12 +49,13 @@ class _HomepageState extends State<Homepage> {
           topRight: Radius.circular(40),
         ),
         child: BottomNavigationBar(
+          backgroundColor: Colors.grey[800],
+
           unselectedItemColor: Colors.white,
           selectedItemColor: const Color.fromARGB(255, 71, 186, 253),
 
+          // unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-
-          backgroundColor: Colors.grey[800],
           
           currentIndex: currentPage,
           onTap: (value) {
