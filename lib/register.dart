@@ -1,3 +1,5 @@
+import 'package:blogs/function/message.dart';
+import 'package:blogs/widgets/heroform.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,25 +13,32 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
+  Message msg = Message();
+
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
   final TextEditingController _confirm = TextEditingController();
   final TextEditingController _username = TextEditingController();
   final TextEditingController _birthday = TextEditingController();
   String university = "";
-  List universities = ["UTAS"];
+  List universities = ["UTAS", "UNizwa", "SQU", "MEC"];
 
   bool hidePassword = true;
   bool hideConfirm = true;
 
-  Future register() async{
+  Future register() async {
     try {
       if (_password.text.trim() != _confirm.text.trim()) throw ErrorHint("Passwords doesn't match");
 
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _email.text.trim(),
         password: _password.text.trim()
-      );
+      )
+      .then((result) {
+        return result.user!.updateProfile(
+          displayName: _username.text.trim(),
+        );
+      });
 
       if (_username.text.trim().isEmpty) throw ErrorHint('Username is empty');
 
@@ -40,40 +49,22 @@ class _RegisterState extends State<Register> {
         'university': university,
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(  
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          dismissDirection: DismissDirection.horizontal,
-          backgroundColor: Colors.green,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          content: const Row(
-            children: [
-              Icon(Icons.check, color: Colors.white, size: 30),
-              SizedBox(width: 10),
-              Text('Registred successfully!', style: TextStyle(color: Colors.white, fontSize: 18)),
-            ],
-          ),
-        )
-      );
+      msg.success(context, Icons.check, 'Registred successfully!', Colors.green);
 
       Navigator.pop(context);
     } catch(error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          dismissDirection: DismissDirection.horizontal,
-          backgroundColor: Colors.red,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          content: Row(
-            children: [
-              const Icon(Icons.close, color: Colors.white, size: 30),
-              const SizedBox(width: 10),
-              Flexible(child: Text(error.toString().replaceAll(RegExp('\\[.+\\]'), '').trim(), style: const TextStyle(color: Colors.white, fontSize: 18))),
-            ],
-          ),
-        )
-      );
+      msg.failed(context, Icons.close, error, Colors.red);
     }
+  }
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    _confirm.dispose();
+    _username.dispose();
+    _birthday.dispose();
+    super.dispose();
   }
 
   @override
@@ -88,50 +79,7 @@ class _RegisterState extends State<Register> {
 
       body: ListView(
         children: [
-          const Stack(
-            alignment: AlignmentDirectional.center,
-            children: [
-              SizedBox(
-                height: 350,
-                child: Card(
-                  elevation: 5,
-                  margin: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(                                           
-                      bottomLeft: Radius.circular(75),
-                      bottomRight: Radius.circular(75),
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(                                           
-                      bottomLeft: Radius.circular(75),
-                      bottomRight: Radius.circular(75),
-                    ),
-                    child: Image(
-                      image: AssetImage("assets/media.png"),
-                      opacity: AlwaysStoppedAnimation(0.4),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-
-              Text(
-                'UTAS\n  BLOGS',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 75,
-                  color: Colors.white,
-                  shadows: [
-                    // Shadow(color: Colors.white, offset: Offset(14, 14)),
-                    Shadow(color: Colors.black, offset: Offset(7, 7)),
-                  ]
-                ),
-              ),
-            ],
-          ),
-          
-          const SizedBox(height: 10),
+          const Heroform(),
           
           Container(
             padding: const EdgeInsets.all(20),
@@ -256,16 +204,16 @@ class _RegisterState extends State<Register> {
                           labelText: 'Birthday',
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                         ),
-                        onTap: () async{
-                          DateTime? _selected = await showDatePicker(
+                        onTap: () async {
+                          DateTime? selected = await showDatePicker(
                             context: context,
                             firstDate: DateTime.utc(1900),
-                            lastDate: DateTime.utc(2100)
+                            lastDate: DateTime.now()
                           );
                       
-                          if (_selected != null) {
+                          if (selected != null) {
                             setState(() {
-                              _birthday.text = DateFormat('d/M/y').format(_selected).toString();
+                              _birthday.text = DateFormat('d/M/y').format(selected).toString();
                             });
                           } else {
                             setState(() {
