@@ -26,7 +26,13 @@ class _RegisterState extends State<Register> {
   bool hidePassword = true;
   bool hideConfirm = true;
 
+  bool isLoading = false;
+  
   Future register() async {
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       if (_password.text.trim() != _confirm.text.trim()) throw ErrorHint("Passwords doesn't match");
 
@@ -54,6 +60,10 @@ class _RegisterState extends State<Register> {
       Navigator.pop(context);
     } catch(error) {
       msg.failed(context, Icons.close, error, Colors.red);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -215,10 +225,6 @@ class _RegisterState extends State<Register> {
                             setState(() {
                               _birthday.text = DateFormat('d/M/y').format(selected).toString();
                             });
-                          } else {
-                            setState(() {
-                              _birthday.text = "";
-                            });
                           }
                         },
                       ),
@@ -254,19 +260,32 @@ class _RegisterState extends State<Register> {
                     ListTile(
                       title: SizedBox(
                         height: 45,
-                        child: FloatingActionButton.extended(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                          label: const Text(
-                              'Register',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20
+                        child: (isLoading == false ? (
+                          FloatingActionButton.extended(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                            label: const Text(
+                                'Register',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20
+                                ),
                               ),
+                            onPressed: () {
+                              register();
+                            },
+                          )
+                        ) : (
+                          FloatingActionButton.extended(
+                            backgroundColor: Colors.grey[500],
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                            label: const SizedBox(
+                              width: 25,
+                              height: 25,
+                              child: CircularProgressIndicator(color: Colors.white)
                             ),
-                          onPressed: () {
-                            register();
-                          },
-                        ),
+                            onPressed: null,
+                          )
+                        )),
                       ),
                     ),
                     

@@ -41,82 +41,89 @@ class CustomLibrary {
   Future<bool?> showBottomAction(context, title, content, actionTitle, actionColor) {
     return showModalBottomSheet<bool>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      clipBehavior: Clip.antiAlias,
       isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[400],
-                    borderRadius: BorderRadius.circular(2),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 60,
+                      height: 5,
+                      margin: const EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
                   ),
-                ),
-              ),
 
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              const SizedBox(height: 12),
-
-              Text(
-                content,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[700],
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              const SizedBox(height: 24),
-
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: actionColor,
-                  minimumSize: const Size.fromHeight(48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                onPressed: () => Navigator.pop(context, true),
-                child: Text(
-                  actionTitle,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
 
-              const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                  Text(
+                    content,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(
-                  'Cancel',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+
+                  const SizedBox(height: 24),
+
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      side: const BorderSide(color: Colors.blue, width: 2),
+                    ),
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: actionColor,
+                      minimumSize: const Size.fromHeight(48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(context, true),
+                    child: Text(
+                      actionTitle,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },

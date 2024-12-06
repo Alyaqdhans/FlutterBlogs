@@ -19,7 +19,13 @@ class _LoginformState extends State<Loginform> {
 
   bool hidePassword = true;
 
+  bool isLoading = false;
+
   Future login() async {
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _email.text.trim(),
@@ -36,6 +42,10 @@ class _LoginformState extends State<Loginform> {
       );
     } catch(error) {
       msg.failed(context, Icons.close, error, Colors.red);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -67,6 +77,7 @@ class _LoginformState extends State<Loginform> {
               labelText: 'Email',
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
             ),
+            onFieldSubmitted: ((value) => login()),
           ),
         ),
 
@@ -84,6 +95,7 @@ class _LoginformState extends State<Loginform> {
                   labelText: 'Password',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                 ),
+                onFieldSubmitted: ((value) => login()),
               ),
             ),
 
@@ -110,19 +122,32 @@ class _LoginformState extends State<Loginform> {
         ListTile(
           title: SizedBox(
             height: 45,
-            child: FloatingActionButton.extended(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-              label: const Text(
-                  'Login',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20
+            child: (isLoading == false ? (
+              FloatingActionButton.extended(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                label: const Text(
+                    'Login',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20
+                    ),
                   ),
+                onPressed: () {
+                  login();
+                },
+              )
+            ) : (
+              FloatingActionButton.extended(
+                backgroundColor: Colors.grey[500],
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                label: const SizedBox(
+                  width: 25,
+                  height: 25,
+                  child: CircularProgressIndicator(color: Colors.white)
                 ),
-              onPressed: () {
-                login();
-              },
-            ),
+                onPressed: null,
+              )
+            )),
           ),
         ),
         

@@ -21,25 +21,33 @@ class _ProfileState extends State<Profile> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _username = TextEditingController();
   final TextEditingController _birthday = TextEditingController();
-  String university = "";
+  String? university;
   List universities = ["UTAS", "UNizwa", "SQU", "MEC"];
 
-  Future update() async {
+  bool isLoading = false;
+
+  Future update(id) async {
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       if (_username.text.trim().isEmpty) throw ErrorHint('Username is empty');
 
-      await FirebaseFirestore.instance.collection('users').add({
-        'email': _email.text.trim(),
+      await FirebaseFirestore.instance.collection('users').doc(id).update({
+        // 'email': _email.text.trim(),
         'username': _username.text.trim(),
         'birthday': _birthday.text.trim(),
         'university': university,
       });
 
-      msg.success(context, Icons.check, 'Registred successfully!', Colors.green);
-
-      Navigator.pop(context);
+      msg.success(context, Icons.check, 'Updated successfully!', Colors.green);
     } catch(error) {
       msg.failed(context, Icons.close, error, Colors.red);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -49,14 +57,7 @@ class _ProfileState extends State<Profile> {
         email: _email.text.trim()
       );
 
-      msg.success(context, Icons.email, 'Reset request has been sent!', Colors.orange);
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) {
-          return const Homepage();
-        })
-      );
+      msg.success(context, Icons.mail_outline, 'Reset request has been sent!', Colors.orange[700]);
     } catch(error) {
       msg.failed(context, Icons.close, error, Colors.red);
     }
@@ -66,7 +67,7 @@ class _ProfileState extends State<Profile> {
     try {
       await FirebaseAuth.instance.signOut();
 
-      msg.success(context, Icons.logout, 'Logged out successfully!', Colors.orange);
+      msg.success(context, Icons.logout, 'Logged out successfully!', Colors.redAccent);
 
       Navigator.pushReplacement(
         context,
@@ -87,9 +88,30 @@ class _ProfileState extends State<Profile> {
     super.dispose();
   }
 
+  // moved stream and values outside builder so it only run once
+  late final Stream<QuerySnapshot> userStream;
+  bool isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (user != null) {
+      userStream = FirebaseFirestore.instance.collection('users')
+      .where('email', isEqualTo: user!.email).snapshots();
+
+      userStream.first.then((snapshot) {
+        if (snapshot.docs.isNotEmpty) {
+          _email.text = snapshot.docs[0]['email'];
+          _username.text = snapshot.docs[0]['username'];
+          _birthday.text = snapshot.docs[0]['birthday'];
+          university = snapshot.docs[0]['university'];
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // check if user logged in or not
     return (user == null ? Scaffold(
       appBar: AppBar(
         title: const Text('Guest Profile'),
@@ -144,93 +166,146 @@ class _ProfileState extends State<Profile> {
                         ),
                       ),
                     ),
-                
-                    ListTile(
-                      title: TextFormField(
-                        controller: _username,
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.person),
-                          labelText: 'Username',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-                        ),
-                      ),
-                    ),
-                
-                    const SizedBox(height: 10),
-                
-                    ListTile(
-                      title: TextFormField(
-                        readOnly: true,
-                        controller: _birthday,
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.cake),
-                          labelText: 'Birthday',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-                        ),
-                        onTap: () async {
-                          DateTime? selected = await showDatePicker(
-                            context: context,
-                            firstDate: DateTime.utc(1900),
-                            lastDate: DateTime.now()
+
+                    StreamBuilder(
+                      stream: userStream,
+                      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 30),
+                              child: CircularProgressIndicator(),
+                            ),
                           );
-                      
-                          if (selected != null) {
-                            setState(() {
-                              _birthday.text = DateFormat('d/M/y').format(selected).toString();
-                            });
-                          } else {
-                            setState(() {
-                              _birthday.text = "";
-                            });
-                          }
-                        },
-                      ),
-                    ),
-                
-                    const SizedBox(height: 10),
-                
-                    ListTile(
-                      title: DropdownButtonFormField(
-                        isExpanded: true,
-                        borderRadius: BorderRadius.circular(15),
-                        items: universities.map((e) {
-                          return DropdownMenuItem(
-                            value: e,
-                            child: Text(e),
+                        }
+
+                        if (snapshot.data!.docs.isEmpty) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 30),
+                              child: Text('(no user data were found)'),
+                            ),
                           );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            university = value.toString();
-                          });
-                        },
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.badge),
-                          labelText: 'University',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-                        ),
-                      ),
-                    ),
-                
-                    const SizedBox(height: 10),
-                    
-                    ListTile(
-                      title: SizedBox(
-                        height: 45,
-                        child: FloatingActionButton.extended(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                          label: const Text(
-                              'Update',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20
+                        }
+
+                        var id = snapshot.data!.docs[0].id;
+
+                        return Column(
+                          children: [
+                            ListTile(
+                              title: TextFormField(
+                                readOnly: true,
+                                controller: _email,
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.email),
+                                  labelText: 'Email',
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                                ),
                               ),
                             ),
-                          onPressed: () {
-                            update();
-                          },
-                        ),
-                      ),
+
+                            const SizedBox(height: 10),
+                            
+                            ListTile(
+                              title: TextFormField(
+                                controller: _username,
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.person),
+                                  labelText: 'Username',
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                                ),
+                              ),
+                            ),
+                        
+                            const SizedBox(height: 10),
+                        
+                            ListTile(
+                              title: TextFormField(
+                                readOnly: true,
+                                controller: _birthday,
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.cake),
+                                  labelText: 'Birthday',
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                                ),
+                                onTap: () async {
+                                  DateTime? selected = await showDatePicker(
+                                    context: context,
+                                    firstDate: DateTime.utc(1900),
+                                    lastDate: DateTime.now()
+                                  );
+                              
+                                  if (selected != null) {
+                                    setState(() {
+                                      _birthday.text = DateFormat('d/M/y').format(selected).toString();
+                                    });
+                                  }
+                                }
+                              ),
+                            ),
+                        
+                            const SizedBox(height: 10),
+                        
+                            ListTile(
+                              title: DropdownButtonFormField(
+                                isExpanded: true,
+                                borderRadius: BorderRadius.circular(15),
+                                value: (university != "" ? university : null), // handle if no value found in database
+                                items: universities.map((e) {
+                                  return DropdownMenuItem(
+                                    value: e,
+                                    child: Text(e),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    university = value.toString();
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.badge),
+                                  labelText: 'University',
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 10),
+                    
+                            ListTile(
+                              title: SizedBox(
+                                height: 45,
+                                child: (isLoading == false ? (
+                                  FloatingActionButton.extended(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                    label: const Text(
+                                        'Update',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20
+                                        ),
+                                      ),
+                                    onPressed: () {
+                                      update(id);
+                                    },
+                                  )
+                                ) : (
+                                  FloatingActionButton.extended(
+                                    backgroundColor: Colors.grey[500],
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                    label: const SizedBox(
+                                      width: 25,
+                                      height: 25,
+                                      child: CircularProgressIndicator(color: Colors.white)
+                                    ),
+                                    onPressed: null,
+                                  )
+                                )),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
                     ),
                 
                     const SizedBox(height: 5),
@@ -239,11 +314,17 @@ class _ProfileState extends State<Profile> {
                       title: Row(
                         children: [
                           Expanded(
+                            flex: 3,
                             child: SizedBox(
                               height: 45,
                               child: FloatingActionButton.extended(
-                                backgroundColor: Colors.orange[600],
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                foregroundColor: Colors.orange[900],
+                                backgroundColor: Colors.orange[100],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  side: const BorderSide(color: Colors.orange, width: 2)
+                                ),
+                                icon: Icon(Icons.key, color: Colors.orange[600]),
                                 label: const Text(
                                     'Reset Password',
                                     style: TextStyle(
@@ -256,8 +337,8 @@ class _ProfileState extends State<Profile> {
                                     context,
                                     'Are you sure you want to reset?',
                                     'You will receive an email on the registered account.',
-                                    'Reset',
-                                    Colors.orange[600]
+                                    'Reset Password',
+                                    Colors.orange[700]
                                   );
 
                                   if (result == true) reset();
@@ -269,11 +350,17 @@ class _ProfileState extends State<Profile> {
                           const SizedBox(width: 10),
                       
                           Expanded(
+                            flex: 2,
                             child: SizedBox(
                               height: 45,
                               child: FloatingActionButton.extended(
-                                backgroundColor: Colors.redAccent,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                foregroundColor: Colors.red[900],
+                                backgroundColor: const Color.fromARGB(255, 255, 214, 211),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  side: const BorderSide(color: Colors.red, width: 2)
+                                ),
+                                icon: Icon(Icons.logout, color: Colors.red[600]),
                                 label: const Text(
                                     'Logout',
                                     style: TextStyle(
@@ -287,7 +374,7 @@ class _ProfileState extends State<Profile> {
                                     'Are you sure you want to logout?',
                                     'You will be logged out from current account.',
                                     'Logout',
-                                    Colors.redAccent
+                                    Colors.red
                                   );
 
                                   if (result == true) logout();
