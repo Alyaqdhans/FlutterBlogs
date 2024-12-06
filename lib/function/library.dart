@@ -7,7 +7,7 @@ class CustomLibrary {
       SnackBar(
         behavior: SnackBarBehavior.floating,
         dismissDirection: DismissDirection.horizontal,
-        backgroundColor: color,
+        backgroundColor: color.withOpacity(0.8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         content: Row(
           children: [
@@ -25,7 +25,7 @@ class CustomLibrary {
       SnackBar(
         behavior: SnackBarBehavior.floating,
         dismissDirection: DismissDirection.horizontal,
-        backgroundColor: color,
+        backgroundColor: color.withOpacity(0.8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         content: Row(
           children: [

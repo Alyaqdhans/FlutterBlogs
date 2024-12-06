@@ -1,4 +1,5 @@
 import 'package:blogs/create.dart';
+import 'package:blogs/function/library.dart';
 import 'package:blogs/tabs/favorites.dart';
 import 'package:blogs/tabs/explore.dart';
 import 'package:blogs/tabs/myblogs.dart';
@@ -13,6 +14,7 @@ class Blogs extends StatefulWidget {
 }
 
 class _BlogsState extends State<Blogs> {
+  CustomLibrary msg = CustomLibrary();
   User? user = FirebaseAuth.instance.currentUser;
 
   @override
@@ -75,10 +77,12 @@ class _BlogsState extends State<Blogs> {
               child: const Icon(Icons.add, size: 35),
             )
           ) : (
-            const FloatingActionButton(
-              backgroundColor: Color.fromARGB(190, 33, 150, 243),
-              onPressed: null,
-              child: Icon(Icons.add, size: 35),
+            FloatingActionButton(
+              backgroundColor: Colors.blue.withOpacity(0.5),
+              onPressed: () {
+                msg.success(context, Icons.info_outline, 'You need to be logged in', Colors.blue[700]);
+              },
+              child: const Icon(Icons.add, size: 35),
             )
           )),
         ),
