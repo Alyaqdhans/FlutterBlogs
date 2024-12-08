@@ -41,18 +41,18 @@ class _RegisterState extends State<Register> {
         password: _password.text.trim()
       )
       .then((result) {
-        return result.user!.updateProfile(
-          displayName: _username.text.trim(),
-        );
+        return result.user!.updateDisplayName(_username.text.trim());
       });
 
       if (_username.text.trim().isEmpty) throw ErrorHint('Username is empty');
 
-      await FirebaseFirestore.instance.collection('users').add({
+      User? user = FirebaseAuth.instance.currentUser;
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
         'email': _email.text.trim(),
         'username': _username.text.trim(),
         'birthday': _birthday.text.trim(),
         'university': university,
+        'admin': false
       });
 
       msg.success(context, Icons.check, 'Registred successfully!', Colors.green);
