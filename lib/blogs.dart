@@ -21,25 +21,42 @@ class _BlogsState extends State<Blogs> {
   bool? isAdmin;
 
   Future _isAdmin() async {
-    if (user == null) return;
-    
-    final userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
-    setState(() {
-      isAdmin = userDoc.data()?['admin'];
-    });
+    if (user == null) { // when admin logs out
+      setState(() {
+        isAdmin = false;
+        return;
+      });
+    }
+    DocumentSnapshot<Map<String, dynamic>>? userDoc;
+
+    try {
+      // trying to get it from cache first
+      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.cache));
+    } catch(error) {
+      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.server));
+    } finally {
+      if (mounted) { // so it doesnt freeze when switching before loaded
+        setState(() {
+          isAdmin = userDoc!.data()?['admin'];
+        });
+      }
+    }
   }
 
   @override
   void initState() {
     super.initState();
+
+    if (!mounted) return; // if page is closed
+    if (user == null) return;
     _isAdmin();
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      initialIndex: (isAdmin == false) ? 1 : 0,
-      length: (isAdmin == false) ? 3 : 1,
+      initialIndex: (isAdmin == false && user != null) ? 1 : 0,
+      length: (isAdmin == false && user != null) ? 3 : 1,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Blogs'),
@@ -56,7 +73,7 @@ class _BlogsState extends State<Blogs> {
             unselectedLabelColor: Colors.white,
             unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
             
-            tabs: (isAdmin == false)
+            tabs: (isAdmin == false && user != null)
             ? [
                 const Tab(text: 'My Blogs', icon: Icon(Icons.library_books)),
                 const Tab(text: 'Explore', icon: Icon(Icons.public)),
@@ -69,7 +86,7 @@ class _BlogsState extends State<Blogs> {
         ),
       
         body: TabBarView(
-          children: (isAdmin == false)
+          children: (isAdmin == false && user != null)
           ? [
               const Myblogs(),
               const Explore(),
