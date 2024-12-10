@@ -11,6 +11,7 @@ class Admin extends StatefulWidget {
 
 class _AdminState extends State<Admin> {
   User? user = FirebaseAuth.instance.currentUser;
+  int currentUserIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +95,10 @@ class _AdminState extends State<Admin> {
                 var email = snapshot.data!.docs[index]['email'];
                 var isActive = snapshot.data!.docs[index]['active'];
                 var isAdmin = snapshot.data!.docs[index]['admin'];
+
+                // checking if current user still admin
+                if (user!.uid == id) currentUserIndex = index;
+                var isCurrentAdmin = snapshot.data!.docs[currentUserIndex]['admin'];
                 
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
@@ -125,7 +130,7 @@ class _AdminState extends State<Admin> {
                             const Text('Admin'),
                             Switch(
                               value: isAdmin,
-                              onChanged: (user!.uid == id)
+                              onChanged: (user!.uid == id || isCurrentAdmin == false)
                               ? null
                               : (value) async {
                                   await FirebaseFirestore.instance.collection('users').doc(id).update({'admin': value});
@@ -138,7 +143,7 @@ class _AdminState extends State<Admin> {
                               icon: (isActive)
                               ? const Icon(Icons.lock_open_outlined)
                               : const Icon(Icons.lock, color: Colors.redAccent,),
-                              onPressed: (user!.uid == id || isAdmin)
+                              onPressed: (user!.uid == id || isAdmin || isCurrentAdmin == false)
                               ? null
                               : () async {
                                 await FirebaseFirestore.instance.collection('users').doc(id).update({'active': !isActive});
