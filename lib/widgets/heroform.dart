@@ -11,7 +11,8 @@ class Heroform extends StatelessWidget {
           alignment: AlignmentDirectional.center,
           children: [
             SizedBox(
-              height: 350,
+              height: 200,
+              width: double.infinity,
               child: Card(
                 elevation: 5,
                 margin: EdgeInsets.zero,
@@ -33,7 +34,7 @@ class Heroform extends StatelessWidget {
               'UTAS\n  BLOGS',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 75,
+                fontSize: 60,
                 color: Colors.white,
                 shadows: [
                   // Shadow(color: Colors.black, offset: Offset(21, 21)),

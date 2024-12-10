@@ -13,7 +13,7 @@ class CustomLibrary {
           children: [
             Icon(icon, color: Colors.white, size: 30),
             const SizedBox(width: 10),
-            Text(text, style: const TextStyle(color: Colors.white, fontSize: 18)),
+            Flexible(child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 18))),
           ],
         ),
       )
@@ -45,7 +45,7 @@ class CustomLibrary {
       backgroundColor: Colors.transparent,
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.all(10),
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
