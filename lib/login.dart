@@ -70,6 +70,8 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    double dynamicFontSize = 16 + (MediaQuery.of(context).size.width * 0.01); // Adjust based on screen width
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
@@ -210,11 +212,11 @@ class _LoginState extends State<Login> {
                         child: (isLoading == false)
                         ? FloatingActionButton.extended(
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                            label: const Text(
+                            label: Text(
                                 'Login',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 20
+                                  fontSize: dynamicFontSize
                                 ),
                               ),
                             onPressed: () {
@@ -234,41 +236,48 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     
-                    ListTile(
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Don't have an account?",
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          
-                          const SizedBox(width: 10),
-
-                          OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                            ),
-                            child: const Text(
-                              'Register',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: ListTile(
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                "Don't have an account?",
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                ),
                               ),
                             ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) {
-                                  return const Register();
-                                })
-                              );
-                            },
-                          ),
-                          
-                        ],
+                            
+                            const SizedBox(width: 10),
+                      
+                            Expanded(
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                                child: const Text(
+                                  'Register',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) {
+                                      return const Register();
+                                    })
+                                  );
+                                },
+                              ),
+                            ),
+                            
+                          ],
+                        ),
                       ),
                     ),
                   ],

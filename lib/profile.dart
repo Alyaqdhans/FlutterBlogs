@@ -293,41 +293,48 @@ class _ProfileState extends State<Profile> {
                         ),
                       ),
                       
-                      ListTile(
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Don't have an account?",
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            
-                            const SizedBox(width: 10),
-
-                            OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              ),
-                              child: const Text(
-                                'Register',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: ListTile(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  "Don't have an account?",
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
                               ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) {
-                                    return const Register();
-                                  })
-                                );
-                              },
-                            ),
-                            
-                          ],
+                              
+                              const SizedBox(width: 10),
+                        
+                              Expanded(
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  child: const Text(
+                                    'Register',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) {
+                                        return const Register();
+                                      })
+                                    );
+                                  },
+                                ),
+                              ),
+                              
+                            ],
+                          ),
                         ),
                       ),
                     ],
