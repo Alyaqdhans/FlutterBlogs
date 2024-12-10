@@ -94,45 +94,51 @@ class _AdminState extends State<Admin> {
                 var email = snapshot.data!.docs[index]['email'];
                 var isAdmin = snapshot.data!.docs[index]['admin'];
                 
-                return Card(
-                  child: ListTile(
-                    title: Text(
-                      username,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                
-                    subtitle: Text(
-                      email,
-                      style: const TextStyle(
-                        fontSize: 15,
-                      ),
-                    ),
-                    
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text('Admin'),
-                        Switch(
-                          value: isAdmin,
-                          onChanged: (user!.uid == id)
-                          ? null
-                          : (value) async {
-                              await FirebaseFirestore.instance.collection('users').doc(id).update({'admin': value});
-                            },
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: ListTile(
+                        title: Text(
+                          username,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
                         ),
-                
-                        const SizedBox(width: 15),
-                
-                        IconButton(
-                          icon: const Icon(Icons.lock_open_outlined),
-                          onPressed: () async {
-                            
-                          },
+                                      
+                        subtitle: Text(
+                          email,
+                          style: const TextStyle(
+                            fontSize: 15,
+                          ),
                         ),
-                      ],
+                        
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('Admin'),
+                            Switch(
+                              value: isAdmin,
+                              onChanged: (user!.uid == id)
+                              ? null
+                              : (value) async {
+                                  await FirebaseFirestore.instance.collection('users').doc(id).update({'admin': value});
+                                },
+                            ),
+                                      
+                            const SizedBox(width: 15),
+                                      
+                            IconButton(
+                              icon: const Icon(Icons.lock_open_outlined),
+                              onPressed: () async {
+                                
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 );

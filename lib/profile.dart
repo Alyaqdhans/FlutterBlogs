@@ -1,3 +1,4 @@
+import 'package:blogs/admin.dart';
 import 'package:blogs/function/library.dart';
 import 'package:blogs/register.dart';
 import 'package:blogs/widgets/heroform.dart';
@@ -23,6 +24,7 @@ class _ProfileState extends State<Profile> {
   final TextEditingController _birthday = TextEditingController();
   String? university;
   List universities = ["UTAS", "UNizwa", "SQU", "MEC"];
+  bool? isAdmin;
 
   bool hidePassword = true;
 
@@ -46,6 +48,7 @@ class _ProfileState extends State<Profile> {
       setState(() {
         user = FirebaseAuth.instance.currentUser;
       });
+      await _userData(); // update user info
     } catch(error) {
       msg.failed(context, Icons.close, error, Colors.red);
     } finally {
@@ -112,6 +115,7 @@ class _ProfileState extends State<Profile> {
       setState(() {
         isSigningout = false;
         _password.text = "";
+        isAdmin = null;
       });
     }
   }
@@ -127,6 +131,7 @@ class _ProfileState extends State<Profile> {
 
   // moved method and values outside builder so it only run once
   late Future userFuture;
+
   Future _userData() async {
     DocumentSnapshot<Map<String, dynamic>>? userDoc;
 
@@ -134,14 +139,18 @@ class _ProfileState extends State<Profile> {
       // trying to get it from cache first
       userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.cache));
     } catch(error) {
+      // get from server if cache fails
       userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.server));
     }
 
     if (userDoc.data()!.isNotEmpty) {
-      _email.text = userDoc.data()!['email'];
-      _username.text = userDoc.data()!['username'];
-      _birthday.text = userDoc.data()!['birthday'];
-      university = userDoc.data()!['university'];
+      setState(() {
+        _email.text = userDoc!.data()!['email'];
+        _username.text = userDoc.data()!['username'];
+        _birthday.text = userDoc.data()!['birthday'];
+        university = userDoc.data()!['university'];
+        isAdmin = userDoc.data()!['admin'];
+      });
     }
   }
 
@@ -151,10 +160,10 @@ class _ProfileState extends State<Profile> {
 
     if (!mounted) return; // if page is closed
     if (user == null) {
-      userFuture = Future.value(); // An empty future to avoid late initialization error.
+      userFuture = Future.value(); // an empty future to avoid late initialization error
       return;
     }
-    userFuture = _userData();
+    userFuture = _userData(); // cache the future so it doesn't refresh when using components like dropdownmenu
   }
 
   @override
@@ -326,6 +335,31 @@ class _ProfileState extends State<Profile> {
         backgroundColor: Colors.grey[800],
         foregroundColor: Colors.white,
       ),
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: (isAdmin == true)
+      ? Container(
+        margin: const EdgeInsets.only(
+          right: 10,
+          bottom: 10,
+        ),
+        width: 60,
+        height: 60,
+        child: FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return const Admin();
+                  })
+                );
+              });
+            },
+            child: const Icon(Icons.dashboard, size: 35)
+          ),
+      )
+      : null,
 
       body: ListView(
         children: [

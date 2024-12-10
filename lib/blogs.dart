@@ -1,10 +1,8 @@
-import 'package:blogs/admin.dart';
 import 'package:blogs/create.dart';
 import 'package:blogs/function/library.dart';
 import 'package:blogs/tabs/favorites.dart';
 import 'package:blogs/tabs/explore.dart';
 import 'package:blogs/tabs/myblogs.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -18,83 +16,42 @@ class Blogs extends StatefulWidget {
 class _BlogsState extends State<Blogs> {
   CustomLibrary msg = CustomLibrary();
   User? user = FirebaseAuth.instance.currentUser;
-  bool? isAdmin;
-
-  Future _isAdmin() async {
-    if (user == null) { // when admin logs out
-      setState(() {
-        isAdmin = false;
-        return;
-      });
-    }
-    DocumentSnapshot<Map<String, dynamic>>? userDoc;
-
-    try {
-      // trying to get it from cache first
-      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.cache));
-    } catch(error) {
-      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.server));
-    } finally {
-      if (mounted) { // so it doesnt freeze when switching before loaded
-        setState(() {
-          isAdmin = userDoc!.data()?['admin'];
-        });
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (!mounted) return; // if page is closed
-    if (user == null) return;
-    _isAdmin();
-  }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      initialIndex: (isAdmin == false && user != null) ? 1 : 0,
-      length: (isAdmin == false && user != null) ? 3 : 1,
+      initialIndex: 1,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Blogs'),
           centerTitle: true,
           backgroundColor: Colors.grey[800],
           foregroundColor: Colors.white,
-          bottom: TabBar(
+          bottom: const TabBar(
             indicatorWeight: 6,
             // indicatorColor: Color.fromARGB(255, 71, 186, 253),
 
-            labelColor: const Color.fromARGB(255, 71, 186, 253),
-            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.8),
+            labelColor: Color.fromARGB(255, 71, 186, 253),
+            labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.8),
 
             unselectedLabelColor: Colors.white,
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
+            unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
             
-            tabs: (isAdmin == false && user != null)
-            ? [
-                const Tab(text: 'My Blogs', icon: Icon(Icons.library_books)),
-                const Tab(text: 'Explore', icon: Icon(Icons.public)),
-                const Tab(text: 'Favorites', icon: Icon(Icons.star)),
-              ]
-            : [
-                const Tab(text: 'Explore', icon: Icon(Icons.public)),
-              ],
+            tabs: [
+              Tab(text: 'My Blogs', icon: Icon(Icons.library_books)),
+              Tab(text: 'Explore', icon: Icon(Icons.public)),
+              Tab(text: 'Favorites', icon: Icon(Icons.star)),
+            ]
           ),
         ),
       
-        body: TabBarView(
-          children: (isAdmin == false && user != null)
-          ? [
-              const Myblogs(),
-              const Explore(),
-              const Favorites(),
-            ]
-          : [
-              const Explore(),
-            ],
+        body: const TabBarView(
+          children: [
+            Myblogs(),
+            Explore(),
+            Favorites(),
+          ]
         ),
 
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -112,15 +69,12 @@ class _BlogsState extends State<Blogs> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) {
-                      if (isAdmin == false) {return const Create();}
-                      else {return const Admin();}
+                      return const Create();
                     })
                   );
                 });
               },
-              child: (isAdmin == null)
-              ? const Center(child: CircularProgressIndicator(color: Colors.white))
-              : Icon((isAdmin == false ? Icons.add : Icons.dashboard), size: 35)
+              child: const Icon(Icons.add, size: 35)
             )
           : FloatingActionButton(
               backgroundColor: Colors.blue.withOpacity(0.5),
