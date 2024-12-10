@@ -2,6 +2,7 @@ import 'package:blogs/function/library.dart';
 import 'package:blogs/homepage.dart';
 import 'package:blogs/register.dart';
 import 'package:blogs/widgets/heroform.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   CustomLibrary msg = CustomLibrary();
+  User? user = FirebaseAuth.instance.currentUser;
 
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
@@ -32,6 +34,15 @@ class _LoginState extends State<Login> {
         email: _email.text.trim(),
         password: _password.text.trim()
       );
+
+      // check if account is disabled
+      user = FirebaseAuth.instance.currentUser;
+      var userData = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
+      bool isActive = userData.data()!['active'];
+      if (isActive == false) {
+        await FirebaseAuth.instance.signOut();
+        throw ErrorHint('Your account is disabled by an administrator');
+      }
 
       msg.success(context, Icons.check, 'Logged in successfully!', Colors.green);
 

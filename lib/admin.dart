@@ -92,11 +92,15 @@ class _AdminState extends State<Admin> {
                 var id = snapshot.data!.docs[index].id;
                 var username = snapshot.data!.docs[index]['username'];
                 var email = snapshot.data!.docs[index]['email'];
+                var isActive = snapshot.data!.docs[index]['active'];
                 var isAdmin = snapshot.data!.docs[index]['admin'];
                 
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   child: Card(
+                    color: Colors.blue[200],
+                    shadowColor: Colors.white,
+                    elevation: 3,
                     child: Padding(
                       padding: const EdgeInsets.all(5),
                       child: ListTile(
@@ -127,13 +131,17 @@ class _AdminState extends State<Admin> {
                                   await FirebaseFirestore.instance.collection('users').doc(id).update({'admin': value});
                                 },
                             ),
-                                      
+                            
                             const SizedBox(width: 15),
-                                      
+                            
                             IconButton(
-                              icon: const Icon(Icons.lock_open_outlined),
-                              onPressed: () async {
-                                
+                              icon: (isActive)
+                              ? const Icon(Icons.lock_open_outlined)
+                              : const Icon(Icons.lock, color: Colors.redAccent,),
+                              onPressed: (user!.uid == id)
+                              ? null
+                              : () async {
+                                await FirebaseFirestore.instance.collection('users').doc(id).update({'active': !isActive});
                               },
                             ),
                           ],

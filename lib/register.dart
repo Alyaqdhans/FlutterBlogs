@@ -52,7 +52,8 @@ class _RegisterState extends State<Register> {
         'username': _username.text.trim(),
         'birthday': _birthday.text.trim(),
         'university': university,
-        'admin': false
+        'active': true,
+        'admin': false,
       });
 
       msg.success(context, Icons.check, 'Registred successfully!', Colors.green);

@@ -43,12 +43,25 @@ class _ProfileState extends State<Profile> {
         password: _password.text.trim()
       );
 
-      msg.success(context, Icons.check, 'Logged in successfully!', Colors.green);
+      // check if account is disabled
+      user = FirebaseAuth.instance.currentUser;
+      var userData = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
+      bool isActive = userData.data()!['active'];
+      if (isActive == false) {
+        await FirebaseAuth.instance.signOut();
+        setState(() {
+          user = null;
+        });
+        throw ErrorHint('Your account is disabled by an administrator');
+      }
 
       setState(() {
         user = FirebaseAuth.instance.currentUser;
       });
+
+      msg.success(context, Icons.check, 'Logged in successfully!', Colors.green);
       await _userData(); // update user info
+
     } catch(error) {
       msg.failed(context, Icons.close, error, Colors.red);
     } finally {
