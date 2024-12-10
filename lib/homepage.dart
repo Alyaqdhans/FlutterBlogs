@@ -24,22 +24,25 @@ class _HomepageState extends State<Homepage> {
       body: pages[currentPage],
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: SizedBox(
-        width: 75,
-        height: 75,
-        child: FloatingActionButton(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-          onPressed: () {
-            setState(() {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) {
-                  return const Search();
-                })
-              );
-            });
-          },
-          child: const Icon(Icons.search, size: 45),
+      floatingActionButton: Visibility(
+        visible: MediaQuery.of(context).viewInsets.bottom == 0.0,
+        child: SizedBox(
+          width: 75,
+          height: 75,
+          child: FloatingActionButton(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+            onPressed: () {
+              setState(() {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return const Search();
+                  })
+                );
+              });
+            },
+            child: const Icon(Icons.search, size: 45),
+          ),
         ),
       ),
 
