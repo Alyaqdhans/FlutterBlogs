@@ -11,7 +11,7 @@ void main() async {
   String? projectId = dotenv.env['PROJECT_ID'];
 
   WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp(
+  await Firebase.initializeApp(
     options: FirebaseOptions(
       apiKey: apikey!,
       appId: appId!,

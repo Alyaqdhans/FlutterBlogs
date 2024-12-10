@@ -138,7 +138,7 @@ class _AdminState extends State<Admin> {
                               icon: (isActive)
                               ? const Icon(Icons.lock_open_outlined)
                               : const Icon(Icons.lock, color: Colors.redAccent,),
-                              onPressed: (user!.uid == id)
+                              onPressed: (user!.uid == id || isAdmin)
                               ? null
                               : () async {
                                 await FirebaseFirestore.instance.collection('users').doc(id).update({'active': !isActive});
