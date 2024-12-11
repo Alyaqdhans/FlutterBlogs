@@ -201,7 +201,7 @@ class _ProfileState extends State<Profile> {
                 elevation: 3,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
                   child: Column(
                     children: [
                       ListTile(
@@ -293,48 +293,45 @@ class _ProfileState extends State<Profile> {
                         ),
                       ),
                       
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: ListTile(
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  "Don't have an account?",
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                  ),
+                      ListTile(
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                "Don't have an account?",
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 15
                                 ),
                               ),
-                              
-                              const SizedBox(width: 10),
-                        
-                              Expanded(
-                                child: OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  child: const Text(
-                                    'Register',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) {
-                                        return const Register();
-                                      })
-                                    );
-                                  },
+                            ),
+                            
+                            const SizedBox(width: 10),
+                      
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                fixedSize: const Size.fromWidth(150)
+                              ),
+                              child: const Text(
+                                'Register',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold
                                 ),
                               ),
-                              
-                            ],
-                          ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) {
+                                    return const Register();
+                                  })
+                                );
+                              },
+                            ),
+                            
+                          ],
                         ),
                       ),
                     ],
@@ -541,13 +538,13 @@ class _ProfileState extends State<Profile> {
                             child: SizedBox(
                               height: 45,
                               child: FloatingActionButton.extended(
-                                foregroundColor: Colors.orange[900],
+                                foregroundColor: Colors.orange[800],
                                 backgroundColor: Colors.orange[100],
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15),
                                   side: const BorderSide(color: Colors.orange, width: 2)
                                 ),
-                                icon: const Icon(Icons.key, color: Colors.orange),
+                                // icon: const Icon(Icons.key, color: Colors.orange),
                                 label: const Text(
                                     'Reset Password',
                                     style: TextStyle(
@@ -578,13 +575,13 @@ class _ProfileState extends State<Profile> {
                               height: 45,
                               child: (isSigningout == false)
                               ? FloatingActionButton.extended(
-                                  foregroundColor: Colors.red[900],
+                                  foregroundColor: Colors.red[800],
                                   backgroundColor: const Color.fromARGB(255, 255, 214, 211),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15),
                                     side: const BorderSide(color: Colors.red, width: 2)
                                   ),
-                                  icon: const Icon(Icons.logout, color: Colors.red),
+                                  // icon: const Icon(Icons.logout, color: Colors.red),
                                   label: const Text(
                                       'Logout',
                                       style: TextStyle(

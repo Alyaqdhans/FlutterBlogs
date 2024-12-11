@@ -1,4 +1,6 @@
+import 'package:blogs/homepage.dart';
 import 'package:blogs/login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,8 +48,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  User? user = FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
-    return const Login();
+    if (user == null) {
+      return const Login();
+    } else {
+      return const Homepage();
+    }
   }
 }
