@@ -30,6 +30,7 @@ class _HomepageState extends State<Homepage> {
           width: 75,
           height: 75,
           child: FloatingActionButton(
+            heroTag: 'search',
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
             onPressed: () {
               setState(() {

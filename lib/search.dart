@@ -10,18 +10,21 @@ class Search extends StatefulWidget {
 class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Search'),
-        centerTitle: true,
-        backgroundColor: Colors.grey[800],
-        foregroundColor: Colors.white,
-      ),
-
-      body: const Column(
-        children: [
-          Text('Welcome')
-        ],
+    return Hero(
+      tag: 'search',
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Search'),
+          centerTitle: true,
+          backgroundColor: Colors.grey[800],
+          foregroundColor: Colors.white,
+        ),
+      
+        body: const Column(
+          children: [
+            Text('Welcome')
+          ],
+        ),
       ),
     );
   }

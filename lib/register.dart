@@ -264,6 +264,7 @@ class _RegisterState extends State<Register> {
                         height: 45,
                         child: (isLoading == false ? (
                           FloatingActionButton.extended(
+                            heroTag: 'profile',
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                             label: const Text(
                                 'Register',

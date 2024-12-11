@@ -64,6 +64,7 @@ class _BlogsState extends State<Blogs> {
           height: 60,
           child: (user != null)
           ? FloatingActionButton(
+              heroTag: 'create',
               onPressed: () {
                 setState(() {
                   Navigator.push(

@@ -270,6 +270,7 @@ class _ProfileState extends State<Profile> {
                           height: 45,
                           child: (isLoading == false)
                           ? FloatingActionButton.extended(
+                              heroTag: 'profile',
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                               label: const Text(
                                   'Login',
@@ -367,18 +368,19 @@ class _ProfileState extends State<Profile> {
         width: 60,
         height: 60,
         child: FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) {
-                    return const Admin();
-                  })
-                );
-              });
-            },
-            child: const Icon(Icons.dashboard, size: 35)
-          ),
+          heroTag: 'dashboard',
+          onPressed: () {
+            setState(() {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return const Admin();
+                })
+              );
+            });
+          },
+          child: const Icon(Icons.dashboard, size: 35)
+        ),
       )
       : null,
 
