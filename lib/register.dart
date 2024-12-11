@@ -34,7 +34,8 @@ class _RegisterState extends State<Register> {
     });
 
     try {
-      if (_password.text.trim() != _confirm.text.trim()) throw ErrorHint("Passwords doesn't match");
+      if (_email.text.trim().isEmpty || _password.text.trim().isEmpty) throw 'Email or Password field is empty';
+      if (_password.text.trim() != _confirm.text.trim()) throw "Passwords don't match";
 
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _email.text.trim(),
@@ -44,7 +45,7 @@ class _RegisterState extends State<Register> {
         return result.user!.updateDisplayName(_username.text.trim());
       });
 
-      if (_username.text.trim().isEmpty) throw ErrorHint('Username is empty');
+      if (_username.text.trim().isEmpty) throw 'Username is empty';
 
       User? user = FirebaseAuth.instance.currentUser;
       await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
@@ -93,12 +94,12 @@ class _RegisterState extends State<Register> {
           const Heroform(),
           
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(10),
             child: Card(
               elevation: 3,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
               child: Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 20),
                 child: Column(
                   children: [
                     ListTile(

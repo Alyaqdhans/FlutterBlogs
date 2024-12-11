@@ -45,7 +45,7 @@ class CustomLibrary {
       backgroundColor: Colors.transparent,
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,

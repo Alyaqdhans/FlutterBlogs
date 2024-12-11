@@ -122,10 +122,18 @@ class _AdminState extends State<Admin> {
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text('Admin'),
+                            Text(
+                              'Admin',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.blue[900]
+                              ),
+                            ),
+
                             Switch(
+                              activeColor: Colors.green[800],
                               value: isAdmin,
-                              onChanged: (user!.uid == id)
+                              onChanged: (user!.uid == id || !isActive)
                               ? null
                               : (value) async {
                                   await FirebaseFirestore.instance.collection('users').doc(id).update({'admin': value});
@@ -135,9 +143,11 @@ class _AdminState extends State<Admin> {
                             const SizedBox(width: 15),
                             
                             IconButton(
+                              constraints: const BoxConstraints(),
+                              padding: EdgeInsets.zero,
                               icon: (isActive)
-                              ? const Icon(Icons.lock_open_outlined)
-                              : const Icon(Icons.lock, color: Colors.redAccent,),
+                              ? const Icon(Icons.lock)
+                              : Icon(Icons.lock, color: Colors.red[900]),
                               onPressed: (user!.uid == id || isAdmin)
                               ? null
                               : () async {

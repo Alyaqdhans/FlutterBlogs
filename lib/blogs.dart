@@ -28,17 +28,17 @@ class _BlogsState extends State<Blogs> {
           centerTitle: true,
           backgroundColor: Colors.grey[800],
           foregroundColor: Colors.white,
-          bottom: const TabBar(
+          bottom: TabBar(
             indicatorWeight: 6,
             // indicatorColor: Color.fromARGB(255, 71, 186, 253),
 
-            labelColor: Color.fromARGB(255, 71, 186, 253),
-            labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.8),
+            labelColor: const Color.fromARGB(255, 71, 186, 253),
+            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.8),
 
-            unselectedLabelColor: Colors.white,
-            unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
+            unselectedLabelColor: Colors.grey[300],
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             
-            tabs: [
+            tabs: const [
               Tab(text: 'My Blogs', icon: Icon(Icons.library_books)),
               Tab(text: 'Explore', icon: Icon(Icons.public)),
               Tab(text: 'Favorites', icon: Icon(Icons.star)),

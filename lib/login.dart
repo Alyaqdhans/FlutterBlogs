@@ -30,6 +30,8 @@ class _LoginState extends State<Login> {
     });
 
     try {
+      if (_email.text.trim().isEmpty || _password.text.trim().isEmpty) throw 'Email or Password field is empty';
+
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _email.text.trim(),
         password: _password.text.trim()
@@ -41,7 +43,7 @@ class _LoginState extends State<Login> {
       bool isActive = userData.data()!['active'];
       if (isActive == false) {
         await FirebaseAuth.instance.signOut();
-        throw ErrorHint('Your account is disabled by an administrator');
+        throw 'Your account is disabled by an administrator';
       }
 
       msg.success(context, Icons.check, 'Logged in successfully!', Colors.green);
@@ -83,12 +85,12 @@ class _LoginState extends State<Login> {
           const Heroform(),
           
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(10),
             child: Card(
               elevation: 3,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
               child: Container(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 5),
                 child: Column(
                   children: [
                     ListTile(
@@ -232,6 +234,8 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     
+                    const SizedBox(height: 5),
+
                     ListTile(
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -250,9 +254,9 @@ class _LoginState extends State<Login> {
                     
                           OutlinedButton(
                             style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              fixedSize: const Size.fromWidth(150)
+                              fixedSize: const Size.fromWidth(150),
+                              maximumSize: const Size.fromHeight(36)
                             ),
                             child: const Text(
                               'Register',
