@@ -17,7 +17,7 @@ class _ExploreState extends State<Explore> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('blogs').snapshots(),
+        stream: FirebaseFirestore.instance.collection('blogs').orderBy('date', descending: true).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(
@@ -26,7 +26,7 @@ class _ExploreState extends State<Explore> {
                 children: [
                   Icon(
                     Icons.warning,
-                    color: Colors.yellow,
+                    color: Colors.blue,
                     size: 60,
                   ),
                   
@@ -35,8 +35,8 @@ class _ExploreState extends State<Explore> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 30,
-                      color: Colors.white,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -60,8 +60,8 @@ class _ExploreState extends State<Explore> {
                 children: [
                   Icon(
                     Icons.search_off,
-                    color: Colors.yellow,
-                    size: 60,
+                    color: Colors.blue,
+                    size: 70,
                   ),
                   
                   Text(
@@ -69,32 +69,42 @@ class _ExploreState extends State<Explore> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 30,
-                      color: Colors.white
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
             );
           }
 
-          return Padding(
-            padding: const EdgeInsets.all(30),
-            child: ListView.builder(
-              itemCount: snapshot.data!.docs.length,
-              itemBuilder: (context, index) {
-                var username = snapshot.data!.docs[index]['user'];
-                var title = snapshot.data!.docs[index]['title'];
-                var contents = snapshot.data!.docs[index]['contents'];
-                var university = snapshot.data!.docs[index]['university'];
-                var department = snapshot.data!.docs[index]['department'];
-                var course = snapshot.data!.docs[index]['course'];
-                var date = snapshot.data!.docs[index]['date'];
-                var isEdited = snapshot.data!.docs[index]['isEdited'];
-                var lastEdited = snapshot.data!.docs[index]['lastEdited'];
-
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5),
+          return ListView.builder(
+            padding: const EdgeInsets.fromLTRB(30, 20, 30, 90),
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              var username = snapshot.data!.docs[index]['user'];
+              var title = snapshot.data!.docs[index]['title'];
+              var contents = snapshot.data!.docs[index]['contents'];
+              var university = snapshot.data!.docs[index]['university'];
+              var department = snapshot.data!.docs[index]['department'];
+              var course = snapshot.data!.docs[index]['course'];
+              var date = snapshot.data!.docs[index]['date'];
+              var isEdited = snapshot.data!.docs[index]['isEdited'];
+              var lastEdited = snapshot.data!.docs[index]['lastEdited'];
+          
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 5,
+                      ),
+                    ],
+                    borderRadius: BorderRadius.circular(10)
+                  ),
                   child: Card(
+                    elevation: 0,
                     child: Padding(
                       padding: const EdgeInsets.all(5),
                       child: ListTile(
@@ -106,29 +116,29 @@ class _ExploreState extends State<Explore> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-
+                  
                             const Icon(Icons.favorite),
                           ],
                         ),
-
+                  
                         subtitle: Column(
                           children: [
                             Divider(
                               color: Colors.grey[300],
                               thickness: 2,
                             ),
-
+                  
                             MarkdownBody(data: contents),
-
+                  
                             Text(
                               username,
                             ),
-
+                  
                             Divider(
                               color: Colors.grey[300],
                               thickness: 2,
                             ),
-
+                  
                             
                           ],
                         ),
@@ -136,10 +146,10 @@ class _ExploreState extends State<Explore> {
                       ),
                     ),
                   ),
-                  
-                );
-              },
-            ),
+                ),
+                
+              );
+            },
           );
 
         }

@@ -1,4 +1,5 @@
 import 'package:blogs/function/library.dart';
+import 'package:blogs/widgets/preview.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +40,7 @@ class _CreateState extends State<Create> {
       await FirebaseFirestore.instance.collection('blogs').add({
         'user': user!.displayName,
         'title': _title.text.trim(),
-        'contents': _content.text.trim(),
+        'contents': _content.text,
         'university': university,
         'department': department,
         'course': _course.text.trim().toLowerCase(),
@@ -73,21 +74,19 @@ class _CreateState extends State<Create> {
       ),
 
       floatingActionButton: FloatingActionButton(
-        heroTag: 'mark',
         child: const Icon(Icons.question_mark),
         onPressed: () {
           showDialog(
             barrierDismissible: true,
             context: context,
-            builder: (context) => Hero(
-              tag: 'mark',
-              child: AlertDialog(
-                // title: const Text('How to use Markdown formatting'),
-                content: GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Image.asset('assets/markdown.png'),
-                )
-              ),
+            builder: (context) => AlertDialog(
+              // title: const Text('How to use Markdown formatting'),
+              content: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: InteractiveViewer( // allow zooming
+                  child: Image.asset('assets/markdown.png')
+                ),
+              )
             ),
           );
         }
@@ -98,7 +97,6 @@ class _CreateState extends State<Create> {
           Padding(
             padding: const EdgeInsets.all(20),
             child: Card(
-              elevation: 2,
               child: Padding(
                 padding: const EdgeInsets.all(30),
                 child: Column(
@@ -120,6 +118,29 @@ class _CreateState extends State<Create> {
                         alignLabelWithHint: true,
                         labelText: 'Blog Contents',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                      ),
+                    ),
+
+                    ListTile(
+                      title: SizedBox(
+                        width: 120,
+                        height: 30,
+                        child: FloatingActionButton.extended(
+                          heroTag: 'preview',
+                          icon: const Icon(Icons.visibility, size: 20),
+                          label: const Text(
+                            'Preview',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) {
+                              return PreviewMarkdown(contents: _content.text);
+                            }));
+                          },
+                        ),
                       ),
                     ),
                     
