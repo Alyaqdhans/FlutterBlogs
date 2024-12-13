@@ -51,7 +51,7 @@ class _RegisterState extends State<Register> {
       await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
         'email': _email.text.trim(),
         'username': _username.text.trim(),
-        'birthday': _birthday.text.trim(),
+        'birthday': _birthday.text,
         'university': university,
         'active': true,
         'admin': false,
@@ -122,8 +122,6 @@ class _RegisterState extends State<Register> {
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 10),
                     
                     Stack(
                       alignment: AlignmentDirectional.centerEnd,
@@ -158,8 +156,6 @@ class _RegisterState extends State<Register> {
                       ]
                     ),
 
-                    const SizedBox(height: 10),
-
                     Stack(
                       alignment: AlignmentDirectional.centerEnd,
                       children: [
@@ -193,8 +189,6 @@ class _RegisterState extends State<Register> {
                       ]
                     ),
 
-                    const SizedBox(height: 10),
-
                     ListTile(
                       title: TextFormField(
                         controller: _username,
@@ -205,8 +199,6 @@ class _RegisterState extends State<Register> {
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 10),
 
                     ListTile(
                       title: TextFormField(
@@ -220,6 +212,7 @@ class _RegisterState extends State<Register> {
                         onTap: () async {
                           DateTime? selected = await showDatePicker(
                             context: context,
+                            initialDate: (_birthday.text.isNotEmpty) ? DateFormat('d/M/y').parse(_birthday.text.toString()) : null,
                             firstDate: DateTime.utc(1900),
                             lastDate: DateTime.now()
                           );
@@ -232,8 +225,6 @@ class _RegisterState extends State<Register> {
                         },
                       ),
                     ),
-
-                    const SizedBox(height: 10),
 
                     ListTile(
                       title: DropdownButtonFormField(

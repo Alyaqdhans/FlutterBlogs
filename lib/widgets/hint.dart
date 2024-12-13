@@ -10,8 +10,10 @@ class MarkdownDemo extends StatefulWidget {
 
 class _MarkdownDemoState extends State<MarkdownDemo> {
   String hint = """
-# **Markdown syntax guide**
+# **&copy; Markdown syntax guide**
 ---
+` `
+
 ## Headers
 ---
 # This is a Heading h1
@@ -65,7 +67,7 @@ You may be using [Markdown Live Preview](https://markdownlivepreview.com/).
 
 ## Tables
 ---
-| Left columns  | Right columns |
+| Left columns  | Right columns (centered) |
 | ------------- |:-------------:|
 | left foo      | right foo     |
 | left bar      | right bar     |
@@ -82,6 +84,16 @@ alert(message);
 ---
 This web site is using `markedjs/marked`.
 
+## Breaking lines (using code syntax)
+---
+### small space
+` `
+### large space
+```
+```
+
+###### **end of guide**
+<div style="text-align: right"> your-text-here </div>
 """;
 
   @override
@@ -135,7 +147,10 @@ This web site is using `markedjs/marked`.
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(20),
-                      child: MarkdownBody(data: hint)
+                      child: MarkdownBody(
+                        data: hint,
+                        fitContent: false
+                      )
                     ),
                   ),
                 ],

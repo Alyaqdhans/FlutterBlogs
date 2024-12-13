@@ -128,7 +128,10 @@ class _ExploreState extends State<Explore> {
                               thickness: 2,
                             ),
                   
-                            MarkdownBody(data: contents),
+                            MarkdownBody(
+                              data: contents,
+                              fitContent: false
+                            ),
                   
                             Text(
                               username,

@@ -166,8 +166,6 @@ class _LoginState extends State<Login> {
                         onFieldSubmitted: ((value) => login()),
                       ),
                     ),
-
-                    const SizedBox(height: 10),
                     
                     Stack(
                       alignment: AlignmentDirectional.centerEnd,

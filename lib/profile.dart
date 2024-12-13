@@ -84,7 +84,7 @@ class _ProfileState extends State<Profile> {
       await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
         // 'email': _email.text.trim(),
         'username': _username.text.trim(),
-        'birthday': _birthday.text.trim(),
+        'birthday': _birthday.text,
         'university': university,
       });
 
@@ -227,8 +227,6 @@ class _ProfileState extends State<Profile> {
                           onFieldSubmitted: ((value) => login()),
                         ),
                       ),
-
-                      const SizedBox(height: 10),
                       
                       Stack(
                         alignment: AlignmentDirectional.centerEnd,
@@ -432,8 +430,6 @@ class _ProfileState extends State<Profile> {
                                 ),
                               ),
                             ),
-
-                            const SizedBox(height: 10),
                             
                             ListTile(
                               title: TextFormField(
@@ -445,9 +441,7 @@ class _ProfileState extends State<Profile> {
                                 ),
                               ),
                             ),
-                        
-                            const SizedBox(height: 10),
-                        
+                                                
                             ListTile(
                               title: TextFormField(
                                 readOnly: true,
@@ -460,6 +454,7 @@ class _ProfileState extends State<Profile> {
                                 onTap: () async {
                                   DateTime? selected = await showDatePicker(
                                     context: context,
+                                    initialDate: DateFormat('d/M/y').parse(_birthday.text.toString()),
                                     firstDate: DateTime.utc(1900),
                                     lastDate: DateTime.now()
                                   );
@@ -472,9 +467,7 @@ class _ProfileState extends State<Profile> {
                                 }
                               ),
                             ),
-                        
-                            const SizedBox(height: 10),
-                        
+                                                
                             ListTile(
                               title: DropdownButtonFormField(
                                 isExpanded: true,
@@ -534,9 +527,7 @@ class _ProfileState extends State<Profile> {
                         );
                       }
                     ),
-                
-                    const SizedBox(height: 5),
-                
+                                
                     ListTile(
                       title: Row(
                         children: [
@@ -574,7 +565,7 @@ class _ProfileState extends State<Profile> {
                             ),
                           ),
                       
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 15),
                       
                           Expanded(
                             flex: 2,

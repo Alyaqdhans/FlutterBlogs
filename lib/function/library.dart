@@ -105,7 +105,7 @@ class CustomLibrary {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
 
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(

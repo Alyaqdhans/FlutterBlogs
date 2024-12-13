@@ -46,6 +46,7 @@ class _PreviewMarkdownState extends State<PreviewMarkdown> {
                   padding: const EdgeInsets.all(10),
                   child: MarkdownBody(
                     data: widget.contents,
+                    fitContent: false
                   )
                 ),
               ),
