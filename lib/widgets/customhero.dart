@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class Heroform extends StatelessWidget {
-  const Heroform({super.key});
+class CustomHero extends StatelessWidget {
+  const CustomHero({super.key});
 
   @override
   Widget build(BuildContext context) {

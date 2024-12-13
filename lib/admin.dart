@@ -24,7 +24,7 @@ class _AdminState extends State<Admin> {
       ),
     
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('users').snapshots(),
+        stream: FirebaseFirestore.instance.collection('users').orderBy('date').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(
@@ -87,6 +87,7 @@ class _AdminState extends State<Admin> {
           }
     
           return ListView.builder(
+            shrinkWrap: true,
             padding: const EdgeInsets.fromLTRB(10, 30, 10, 30),
             itemCount: snapshot.data!.docs.length + 1,
             itemBuilder: (context, index) {
@@ -135,9 +136,9 @@ class _AdminState extends State<Admin> {
                   ),
                 );
               }
-
+    
               var userData = snapshot.data!.docs[index - 1];
-
+    
               var id = userData.id;
               var username = userData['username'];
               var email = userData['email'];
@@ -182,7 +183,7 @@ class _AdminState extends State<Admin> {
                           ),
                           
                           const SizedBox(width: 10),
-
+    
                           IconButton(
                             icon: (isActive)
                             ? const Icon(Icons.lock)

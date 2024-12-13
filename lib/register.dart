@@ -1,5 +1,5 @@
-import 'package:blogs/function/library.dart';
-import 'package:blogs/widgets/heroform.dart';
+import 'package:blogs/function/messenger.dart';
+import 'package:blogs/widgets/customhero.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +13,7 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  CustomLibrary msg = CustomLibrary();
+  Messenger msg = Messenger();
 
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
@@ -53,6 +53,7 @@ class _RegisterState extends State<Register> {
         'username': _username.text.trim(),
         'birthday': _birthday.text,
         'university': university,
+        'date': DateTime.now(),
         'active': true,
         'admin': false,
       });
@@ -92,7 +93,7 @@ class _RegisterState extends State<Register> {
       body: ListView(
         padding: const EdgeInsets.only(bottom: 50),
         children: [
-          const Heroform(),
+          const CustomHero(),
           
           Container(
             padding: const EdgeInsets.all(10),

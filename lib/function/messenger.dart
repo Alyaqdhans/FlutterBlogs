@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomLibrary {
+class Messenger {
   
   success(context, icon, text, color) {
     ScaffoldMessenger.of(context).showSnackBar(  

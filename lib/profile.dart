@@ -1,7 +1,7 @@
 import 'package:blogs/admin.dart';
-import 'package:blogs/function/library.dart';
+import 'package:blogs/function/messenger.dart';
 import 'package:blogs/register.dart';
-import 'package:blogs/widgets/heroform.dart';
+import 'package:blogs/widgets/customhero.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +15,7 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  CustomLibrary msg = CustomLibrary();
+  Messenger msg = Messenger();
   User? user = FirebaseAuth.instance.currentUser;
 
   final TextEditingController _email = TextEditingController();
@@ -196,7 +196,7 @@ class _ProfileState extends State<Profile> {
         body: ListView(
           padding: const EdgeInsets.only(bottom: 50),
           children: [
-            const Heroform(),
+            const CustomHero(),
             
             Container(
               padding: const EdgeInsets.all(10),
@@ -385,7 +385,7 @@ class _ProfileState extends State<Profile> {
       body: ListView(
         padding: const EdgeInsets.only(bottom: 50),
         children: [
-          const Heroform(),
+          const CustomHero(),
           
           Container(
             padding: const EdgeInsets.all(10),

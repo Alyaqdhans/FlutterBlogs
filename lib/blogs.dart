@@ -1,5 +1,5 @@
 import 'package:blogs/create.dart';
-import 'package:blogs/function/library.dart';
+import 'package:blogs/function/messenger.dart';
 import 'package:blogs/tabs/favorites.dart';
 import 'package:blogs/tabs/explore.dart';
 import 'package:blogs/tabs/myblogs.dart';
@@ -14,7 +14,7 @@ class Blogs extends StatefulWidget {
 }
 
 class _BlogsState extends State<Blogs> {
-  CustomLibrary msg = CustomLibrary();
+  Messenger msg = Messenger();
   User? user = FirebaseAuth.instance.currentUser;
 
   @override

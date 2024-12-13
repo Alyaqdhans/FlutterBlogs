@@ -1,4 +1,4 @@
-import 'package:blogs/function/library.dart';
+import 'package:blogs/function/messenger.dart';
 import 'package:blogs/widgets/hint.dart';
 import 'package:blogs/widgets/preview.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,7 +14,7 @@ class Create extends StatefulWidget {
 
 class _CreateState extends State<Create> {
   User? user = FirebaseAuth.instance.currentUser;
-  CustomLibrary msg = CustomLibrary();
+  Messenger msg = Messenger();
 
   final TextEditingController _title = TextEditingController();
   final TextEditingController _content = TextEditingController();
@@ -38,16 +38,17 @@ class _CreateState extends State<Create> {
       || department!.isEmpty
       || _course.text.trim().isEmpty) throw 'Some fields are empty';
 
+      DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(user!.uid);
+
       await FirebaseFirestore.instance.collection('blogs').add({
-        'user': user!.displayName,
+        'userRef': userRef,
         'title': _title.text.trim(),
         'contents': _content.text.trim(),
-        'university': university,
-        'department': department,
-        'course': _course.text.trim().toLowerCase(),
+        'tags': [university, department, _course.text.trim().toLowerCase()],
         'date': DateTime.now(),
         'isEdited': false,
-        'lastEdited': DateTime.now()
+        'lastEdited': DateTime.now(),
+        'favorites': 0
       });
 
       msg.success(context, Icons.check, 'Blog created successfully!', Colors.green);
@@ -130,7 +131,7 @@ class _CreateState extends State<Create> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                           onPressed: () {
                             Navigator.push(context, MaterialPageRoute(builder: (context) {
-                              return PreviewMarkdown(contents: _content.text.trim());
+                              return PreviewMarkdown(contents: _content.text.trim(), tag: 'preview');
                             }));
                           },
                         ),
@@ -209,31 +210,37 @@ class _CreateState extends State<Create> {
                     
                     ListTile(
                       title: (isLoading == false)
-                      ? FloatingActionButton.extended(
-                          heroTag: 'create',
-                          icon: const Icon(Icons.library_add),
-                          label: const Text(
-                            'Create',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20
-                            )
+                      ? SizedBox(
+                          height: 45,
+                          child: FloatingActionButton.extended(
+                            heroTag: 'create',
+                            icon: const Icon(Icons.library_add),
+                            label: const Text(
+                              'Create',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20
+                              )
+                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                            onPressed: () {
+                              create();
+                            }
                           ),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                          onPressed: () {
-                            create();
-                          }
                         )
-                      : FloatingActionButton.extended(
-                          heroTag: null,
-                          backgroundColor: Colors.grey[500],
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                          label: const SizedBox(
-                            width: 25,
-                            height: 25,
-                            child: CircularProgressIndicator(color: Colors.white)
+                      : SizedBox(
+                        height: 45,
+                          child: FloatingActionButton.extended(
+                            heroTag: null,
+                            backgroundColor: Colors.grey[500],
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                            label: const SizedBox(
+                              width: 25,
+                              height: 25,
+                              child: CircularProgressIndicator(color: Colors.white)
+                            ),
+                            onPressed: null,
                           ),
-                          onPressed: null,
                         ),
                     )
                   ],

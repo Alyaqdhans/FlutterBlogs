@@ -1,7 +1,7 @@
+import 'package:blogs/widgets/blogcard.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 
 class Explore extends StatefulWidget {
   const Explore({super.key});
@@ -77,84 +77,7 @@ class _ExploreState extends State<Explore> {
             );
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.fromLTRB(30, 20, 30, 90),
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              var username = snapshot.data!.docs[index]['user'];
-              var title = snapshot.data!.docs[index]['title'];
-              var contents = snapshot.data!.docs[index]['contents'];
-              var university = snapshot.data!.docs[index]['university'];
-              var department = snapshot.data!.docs[index]['department'];
-              var course = snapshot.data!.docs[index]['course'];
-              var date = snapshot.data!.docs[index]['date'];
-              var isEdited = snapshot.data!.docs[index]['isEdited'];
-              var lastEdited = snapshot.data!.docs[index]['lastEdited'];
-          
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 5,
-                      ),
-                    ],
-                    borderRadius: BorderRadius.circular(10)
-                  ),
-                  child: Card(
-                    elevation: 0,
-                    child: Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: ListTile(
-                        title: Row(
-                          children: [
-                            Text(
-                              title,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                  
-                            const Icon(Icons.favorite),
-                          ],
-                        ),
-                  
-                        subtitle: Column(
-                          children: [
-                            Divider(
-                              color: Colors.grey[300],
-                              thickness: 2,
-                            ),
-                  
-                            MarkdownBody(
-                              data: contents,
-                              fitContent: false
-                            ),
-                  
-                            Text(
-                              username,
-                            ),
-                  
-                            Divider(
-                              color: Colors.grey[300],
-                              thickness: 2,
-                            ),
-                  
-                            
-                          ],
-                        ),
-                        
-                      ),
-                    ),
-                  ),
-                ),
-                
-              );
-            },
-          );
-
+          return BlogCard(snapshot: snapshot);
         }
       ),
     );
