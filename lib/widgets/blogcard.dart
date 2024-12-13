@@ -16,7 +16,7 @@ class _BlogCardState extends State<BlogCard> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(30, 20, 30, 90),
+      padding: const EdgeInsets.fromLTRB(10, 20, 10, 90),
       itemCount: widget.snapshot.data!.docs.length,
       itemBuilder: (context, index) {
         var blogData = widget.snapshot.data!.docs[index];
@@ -29,13 +29,17 @@ class _BlogCardState extends State<BlogCard> {
         var date = (blogData['date'] as Timestamp).toDate();
         var isEdited = blogData['isEdited'];
         var lastEdited = (blogData['lastEdited'] as Timestamp).toDate();
+        var favorites = blogData['favorites'];
 
         return FutureBuilder<DocumentSnapshot>(
           future: userRef.get(),
           builder: (context, userSnapshot) {
             if (userSnapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
+              return const Padding(
+                padding: EdgeInsets.all(50),
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
               );
             }
 
@@ -64,7 +68,7 @@ class _BlogCardState extends State<BlogCard> {
                 child: Card(
                   elevation: 0,
                   child: Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -84,48 +88,13 @@ class _BlogCardState extends State<BlogCard> {
                             
                             Row(
                               children: [
-                                // Expand Menu
-                                PopupMenuButton(
-                                  elevation: 7,
-                                  tooltip: 'Extra',
-                                  icon: const Icon(Icons.more_vert),
-                                  onSelected: (value) {
-                                    if (value == 'Edit') {
-                                      // Handle edit action
-                                    } else if (value == 'Delete') {
-                                      // Handle delete action
-                                    }
-                                  },
-                                  itemBuilder: (context) => [
-                                    const PopupMenuItem(
-                                      value: 'Edit',
-                                      child: ListTile(
-                                        leading: Icon(Icons.edit, color: Colors.blue),
-                                        title: Text(
-                                          'Edit',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.blue
-                                          )
-                                        ),
-                                      ),
-                                    ),
-
-                                    const PopupMenuItem(
-                                      value: 'Delete',
-                                      child: ListTile(
-                                        leading: Icon(Icons.delete, color: Colors.red),
-                                        title: Text(
-                                          'Delete',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.red
-                                          )
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                Text(
+                                  favorites.toString(),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold
+                                  )
                                 ),
+
                                 // Favorite
                                 IconButton(
                                   tooltip: 'Favorite',
@@ -138,70 +107,126 @@ class _BlogCardState extends State<BlogCard> {
                             ),
                           ],
                         ),
+
+                        const Divider(color: Colors.blue),
+
                         const SizedBox(height: 8),
 
                         // Preview of Contents
                         MarkdownBody(
-                          data: contents.length > 80 ? '${contents.substring(0, 100)}...' : contents,
+                          data: contents.length > 70 ? '${contents.substring(0, 100)}...' : contents,
+                          fitContent: false,
                         ),
 
                         const SizedBox(height: 8),
 
                         // Floating Action Button for Read More
-                        Center(
-                          child: SizedBox(
-                            height: 30,
-                            child: FloatingActionButton.extended(
-                              foregroundColor: Colors.blue,
-                              backgroundColor: Colors.white,
-                              heroTag: 'preview',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PreviewMarkdown(contents: contents, tag: id),
-                                  ),
-                                );
-                              },
-                              label: const Text('Read More'),
+                        if (contents.length > 70)
+                          Center(
+                            child: SizedBox(
+                              height: 30,
+                              child: FloatingActionButton.extended(
+                                elevation: 1,
+                                foregroundColor: Colors.blue,
+                                backgroundColor: Colors.white,
+                                heroTag: id,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PreviewMarkdown(contents: contents, tag: id),
+                                    ),
+                                  );
+                                },
+                                label: const Text('Read More'),
+                              ),
                             ),
                           ),
-                        ),
 
                         const SizedBox(height: 8),
 
-                        // Created and Edited Dates
-                        Text(
-                          'Created on: ${DateFormat('d/m/y H:M a').format(date)}',
-                          style: const TextStyle(color: Colors.grey, fontSize: 12),
-                        ),
-                        if (isEdited)
-                          Text(
-                            'Edited on: ${DateFormat('d/m/y H:M a').format(lastEdited)}',
-                            style: const TextStyle(color: Colors.grey, fontSize: 12),
-                          ),
-
-                        const Divider(),
+                        const Divider(color: Colors.blue),
 
                         // Username
                         Text(
                           'By $username',
-                          style: const TextStyle(color: Colors.grey),
+                          style: TextStyle(color: Colors.grey[600]),
                         ),
+
+                        const SizedBox(height: 5),
+
+                        // Created and Edited Dates
+                        Text(
+                          'Created on: ${DateFormat('d/M/y H:M a').format(date)}',
+                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                        ),
+                        if (isEdited)
+                          Text(
+                            'Edited on: ${DateFormat('d/M/y H:M a').format(lastEdited)}',
+                            style: const TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
 
                         const SizedBox(height: 10),
 
-                        // Tags
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 4,
-                          children: tags.map((tag) {
-                            return Chip(
-                              label: Text(tag, style: const TextStyle(color: Colors.white)),
-                              backgroundColor: Colors.teal,
-                              side: BorderSide.none,
-                            );
-                          }).toList(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Tags
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
+                              children: tags.map((tag) {
+                                return Chip(
+                                  label: Text(tag, style: const TextStyle(color: Colors.white)),
+                                  backgroundColor: Colors.teal,
+                                  side: BorderSide.none,
+                                );
+                              }).toList(),
+                            ),
+
+                            // Expand Menu
+                            PopupMenuButton(
+                              elevation: 7,
+                              tooltip: 'Extra',
+                              icon: const Icon(Icons.more_vert),
+                              onSelected: (value) {
+                                if (value == 'Edit') {
+                                  // Handle edit action
+                                } else if (value == 'Delete') {
+                                  // Handle delete action
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  value: 'Edit',
+                                  child: ListTile(
+                                    leading: Icon(Icons.edit, color: Colors.blue),
+                                    title: Text(
+                                      'Edit',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue
+                                      )
+                                    ),
+                                  ),
+                                ),
+
+                                const PopupMenuItem(
+                                  value: 'Delete',
+                                  child: ListTile(
+                                    leading: Icon(Icons.delete, color: Colors.red),
+                                    title: Text(
+                                      'Delete',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red
+                                      )
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ],
                     ),

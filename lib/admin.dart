@@ -26,6 +26,16 @@ class _AdminState extends State<Admin> {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('users').orderBy('date').snapshots(),
         builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: SizedBox(
+                width: 100,
+                height: 100,
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+            );
+          }
+
           if (snapshot.hasError) {
             return const Center(
               child: Column(
@@ -47,16 +57,6 @@ class _AdminState extends State<Admin> {
                     textAlign: TextAlign.center,
                   ),
                 ],
-              ),
-            );
-          }
-    
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: SizedBox(
-                width: 100,
-                height: 100,
-                child: CircularProgressIndicator(color: Colors.white),
               ),
             );
           }

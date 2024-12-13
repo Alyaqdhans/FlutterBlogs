@@ -19,6 +19,16 @@ class _ExploreState extends State<Explore> {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('blogs').orderBy('date', descending: true).snapshots(),
         builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: SizedBox(
+                width: 100,
+                height: 100,
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+          
           if (snapshot.hasError) {
             return const Center(
               child: Column(
@@ -39,16 +49,6 @@ class _ExploreState extends State<Explore> {
                     textAlign: TextAlign.center,
                   ),
                 ],
-              ),
-            );
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: SizedBox(
-                width: 100,
-                height: 100,
-                child: CircularProgressIndicator(),
               ),
             );
           }

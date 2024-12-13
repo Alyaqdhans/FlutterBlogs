@@ -11,14 +11,50 @@ class Myblogs extends StatefulWidget {
 }
 
 class _MyblogsState extends State<Myblogs> {
-  String ref = '/users/${FirebaseAuth.instance.currentUser!.uid}';
+  User? user = FirebaseAuth.instance.currentUser;
+  DocumentReference ref = FirebaseFirestore.instance.doc('/users/${FirebaseAuth.instance.currentUser!.uid}');
 
   @override
   Widget build(BuildContext context) {
+    // check if user is logged in
+    if (user == null) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.logout,
+              color: Colors.blue,
+              size: 60,
+            ),
+            
+            Text(
+              'You have to be logged in',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 30,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('blogs').orderBy('date', descending: true).where('userRef', isEqualTo: ref).snapshots(),
         builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: SizedBox(
+                width: 100,
+                height: 100,
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
           if (snapshot.hasError) {
             return const Center(
               child: Column(
@@ -39,16 +75,6 @@ class _MyblogsState extends State<Myblogs> {
                     textAlign: TextAlign.center,
                   ),
                 ],
-              ),
-            );
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: SizedBox(
-                width: 100,
-                height: 100,
-                child: CircularProgressIndicator(),
               ),
             );
           }

@@ -59,7 +59,7 @@ class _PreviewMarkdownState extends State<PreviewMarkdown> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    Icons.folder_off,
+                    Icons.visibility_off,
                     color: Colors.blue,
                     size: 70,
                   ),
