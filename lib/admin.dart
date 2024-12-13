@@ -87,10 +87,10 @@ class _AdminState extends State<Admin> {
           }
     
           return ListView.builder(
-            padding: const EdgeInsets.fromLTRB(30, 60, 30, 60),
+            padding: const EdgeInsets.fromLTRB(10, 30, 10, 30),
             itemCount: snapshot.data!.docs.length + 1,
             itemBuilder: (context, index) {
-              // Display the hint card to explain the info fields
+              // Display a info hint to explain controls
               if (index == 0) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
@@ -98,39 +98,38 @@ class _AdminState extends State<Admin> {
                     color: Colors.grey[300],
                     shadowColor: Colors.white,
                     elevation: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: ListTile(
-                        title: const Text(
-                          "Username",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                    child: ListTile(
+                      title: const Text(
+                        "Username",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      subtitle: const Text('Email Address'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Admin',
+                            style: TextStyle(
+                              color: Colors.green[900],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14
+                            ),
                           ),
-                        ),
-                        subtitle: const Text('Email Address'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Admin',
-                              style: TextStyle(
-                                color: Colors.green[900],
-                                fontWeight: FontWeight.bold
-                              ),
+                    
+                          const SizedBox(width: 15),
+                    
+                          Text(
+                            'Disable',
+                            style: TextStyle(
+                              color: Colors.red[900],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14
                             ),
-
-                            const SizedBox(width: 10),
-
-                            Text(
-                              'Disable',
-                              style: TextStyle(
-                                color: Colors.red[900],
-                                fontWeight: FontWeight.bold
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -194,8 +193,6 @@ class _AdminState extends State<Admin> {
                               await FirebaseFirestore.instance.collection('users').doc(id).update({'active': !isActive});
                             },
                           ),
-
-                          const SizedBox(width: 5),
                         ],
                       ),
                     ),

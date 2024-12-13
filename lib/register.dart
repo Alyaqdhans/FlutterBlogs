@@ -90,6 +90,7 @@ class _RegisterState extends State<Register> {
       ),
 
       body: ListView(
+        padding: const EdgeInsets.only(bottom: 50),
         children: [
           const Heroform(),
           

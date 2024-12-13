@@ -1,4 +1,5 @@
 import 'package:blogs/function/library.dart';
+import 'package:blogs/widgets/hint.dart';
 import 'package:blogs/widgets/preview.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,7 +41,7 @@ class _CreateState extends State<Create> {
       await FirebaseFirestore.instance.collection('blogs').add({
         'user': user!.displayName,
         'title': _title.text.trim(),
-        'contents': _content.text,
+        'contents': _content.text.trim(),
         'university': university,
         'department': department,
         'course': _course.text.trim().toLowerCase(),
@@ -74,25 +75,17 @@ class _CreateState extends State<Create> {
       ),
 
       floatingActionButton: FloatingActionButton(
+        heroTag: 'markdown',
         child: const Icon(Icons.question_mark),
         onPressed: () {
-          showDialog(
-            barrierDismissible: true,
-            context: context,
-            builder: (context) => AlertDialog(
-              // title: const Text('How to use Markdown formatting'),
-              content: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: InteractiveViewer( // allow zooming
-                  child: Image.asset('assets/markdown.png')
-                ),
-              )
-            ),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return const MarkdownDemo();
+          }));
         }
       ),
     
       body: ListView(
+        padding: const EdgeInsets.only(bottom: 60),
         children: [
           Padding(
             padding: const EdgeInsets.all(20),
@@ -137,15 +130,13 @@ class _CreateState extends State<Create> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                           onPressed: () {
                             Navigator.push(context, MaterialPageRoute(builder: (context) {
-                              return PreviewMarkdown(contents: _content.text);
+                              return PreviewMarkdown(contents: _content.text.trim());
                             }));
                           },
                         ),
                       ),
                     ),
-                    
-                    const SizedBox(height: 15),
-                    
+                                        
                     ListTile(
                       title: Text(
                         'Tags',

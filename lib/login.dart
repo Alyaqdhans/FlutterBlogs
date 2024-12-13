@@ -81,6 +81,7 @@ class _LoginState extends State<Login> {
       ),
 
       body: ListView(
+        padding: const EdgeInsets.only(bottom: 50),
         children: [
           const Heroform(),
           
@@ -256,8 +257,7 @@ class _LoginState extends State<Login> {
                           OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                              fixedSize: const Size.fromWidth(150),
-                              maximumSize: const Size.fromHeight(36)
+                              fixedSize: const Size(130, 35),
                             ),
                             child: const Text(
                               'Register',

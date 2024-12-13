@@ -35,7 +35,24 @@ void main() async {
   runApp(MaterialApp(
     home: const Home(),
     theme: ThemeData(
-      useMaterial3: false,
+      useMaterial3: true,
+      primaryColor: Colors.blue,
+      
+      colorScheme: const ColorScheme.light(
+        primary: Colors.blue,
+        secondary: Colors.blueAccent,
+      ),
+
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.blue,
+        ),
+      ),
+
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50))
+      )
     ),
   ));
 }

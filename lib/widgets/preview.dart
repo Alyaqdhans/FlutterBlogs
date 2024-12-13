@@ -1,3 +1,4 @@
+import 'package:blogs/function/library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -10,6 +11,8 @@ class PreviewMarkdown extends StatefulWidget {
 }
 
 class _PreviewMarkdownState extends State<PreviewMarkdown> {
+  CustomLibrary msg = CustomLibrary();
+
   @override
   Widget build(BuildContext context) {
     return Hero(
@@ -27,8 +30,8 @@ class _PreviewMarkdownState extends State<PreviewMarkdown> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: FloatingActionButton.extended(
           heroTag: null,
-          icon: const Icon(Icons.navigate_before),
-          label: const Text('Back'),
+          icon: const Icon(Icons.navigate_before, size: 30),
+          label: const Text('Back', style: TextStyle(fontWeight: FontWeight.bold)),
           onPressed: () {
             Navigator.pop(context);
           }
@@ -41,16 +44,18 @@ class _PreviewMarkdownState extends State<PreviewMarkdown> {
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: MarkdownBody(data: widget.contents)
+                  child: MarkdownBody(
+                    data: widget.contents,
+                  )
                 ),
               ),
             ],
           )
-        : const Center(
+        : Center(
             child: Card(
               child: Padding(
-                padding: EdgeInsets.all(50),
-                child: Column(
+                padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
+                child: const Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(

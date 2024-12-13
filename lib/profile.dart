@@ -194,6 +194,7 @@ class _ProfileState extends State<Profile> {
         ),
 
         body: ListView(
+          padding: const EdgeInsets.only(bottom: 50),
           children: [
             const Heroform(),
             
@@ -317,8 +318,7 @@ class _ProfileState extends State<Profile> {
                             OutlinedButton(
                               style: OutlinedButton.styleFrom(
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                fixedSize: const Size.fromWidth(150),
-                                maximumSize: const Size.fromHeight(36)
+                                fixedSize: const Size(130, 35),
                               ),
                               child: const Text(
                                 'Register',
@@ -385,6 +385,7 @@ class _ProfileState extends State<Profile> {
       : null,
 
       body: ListView(
+        padding: const EdgeInsets.only(bottom: 50),
         children: [
           const Heroform(),
           

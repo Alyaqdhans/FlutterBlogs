@@ -29,14 +29,14 @@ class _BlogsState extends State<Blogs> {
           backgroundColor: Colors.grey[800],
           foregroundColor: Colors.white,
           bottom: TabBar(
-            indicatorWeight: 6,
-            // indicatorColor: Color.fromARGB(255, 71, 186, 253),
+            indicatorWeight: 7,
+            indicatorColor: const Color.fromARGB(255, 71, 186, 253),
 
             labelColor: const Color.fromARGB(255, 71, 186, 253),
-            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.8),
+            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.7),
 
             unselectedLabelColor: Colors.grey[300],
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
             
             tabs: const [
               Tab(text: 'My Blogs', icon: Icon(Icons.library_books)),

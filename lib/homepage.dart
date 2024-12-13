@@ -10,22 +10,35 @@ class Homepage extends StatefulWidget {
   State<Homepage> createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
-  List<Widget> pages = [
-    const Blogs(),
-    const Profile()
-  ];
+class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  int _selectedIndex = 0;
 
-  int currentPage = 0;
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      setState(() {
+        _selectedIndex = _tabController.index;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[currentPage],
+      body: TabBarView(
+        controller: _tabController,
+        children: const [
+          Blogs(),
+          Profile()
+        ],
+      ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Visibility(
-        visible: MediaQuery.of(context).viewInsets.bottom == 0.0,
+      floatingActionButton: Visibility( // hides search button when mobile keyboard appears
+        visible: MediaQuery.of(context).viewInsets.bottom == 0,
         child: SizedBox(
           width: 75,
           height: 75,
@@ -48,32 +61,32 @@ class _HomepageState extends State<Homepage> {
       ),
 
       bottomNavigationBar: ClipRRect(
-        borderRadius: const BorderRadius.only(                                           
-          topLeft: Radius.circular(40),
-          topRight: Radius.circular(40),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(40)
         ),
         child: BottomNavigationBar(
           backgroundColor: Colors.grey[800],
-
+        
           unselectedItemColor: Colors.white,
           selectedItemColor: const Color.fromARGB(255, 71, 186, 253),
-
+        
           // unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
           
-          currentIndex: currentPage,
-          onTap: (value) {
+          currentIndex: _selectedIndex,
+          onTap: (index) {
             setState(() {
-              currentPage = value;
+              _selectedIndex = index;
+              _tabController.animateTo(index);
             });
           },
           items: [
             BottomNavigationBarItem(
-              icon: Icon((currentPage == 0 ? Icons.home : Icons.home_outlined), size: 30),
+              icon: Icon((_selectedIndex == 0 ? Icons.home : Icons.home_outlined), size: 30),
               label: "Home"
             ),
             BottomNavigationBarItem(
-              icon: Icon((currentPage == 1 ? Icons.person : Icons.person_outlined), size: 30),
+              icon: Icon((_selectedIndex == 1 ? Icons.person : Icons.person_outlined), size: 30),
               label: "Profile"
             ),
           ],
