@@ -44,7 +44,8 @@ class _MyblogsState extends State<Myblogs> {
       backgroundColor: Colors.grey[200],
 
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('blogs').where('userid', isEqualTo: user!.uid).snapshots(),
+        stream: FirebaseFirestore.instance.collection('blogs').orderBy('date', descending: true)
+        .where('userid', isEqualTo: user!.uid).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(

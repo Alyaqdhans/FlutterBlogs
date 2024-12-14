@@ -19,7 +19,7 @@ class _ExploreState extends State<Explore> {
       backgroundColor: Colors.grey[200],
       
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('blogs').snapshots(),
+        stream: FirebaseFirestore.instance.collection('blogs').orderBy('date', descending: true).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(

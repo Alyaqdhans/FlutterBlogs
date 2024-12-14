@@ -50,19 +50,11 @@ class _BlogCardState extends State<BlogCard> {
 
   @override
   Widget build(BuildContext context) {
-    // Sort the documents by the 'date' field in descending order
-    var sortedDocs = widget.snapshot.data!.docs;
-    sortedDocs.sort((a, b) {
-      DateTime dateA = (a['date'] as Timestamp).toDate();
-      DateTime dateB = (b['date'] as Timestamp).toDate();
-      return dateB.compareTo(dateA); // Descending order
-    });
-
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(10, 20, 10, 90),
-      itemCount: sortedDocs.length,
+      itemCount: widget.snapshot.data!.docs.length,
       itemBuilder: (context, index) {
-        var blogData = sortedDocs[index];
+        var blogData = widget.snapshot.data!.docs[index];
 
         var userId = blogData['userid'];
         var username = blogData['username'];
