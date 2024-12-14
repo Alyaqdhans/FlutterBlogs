@@ -1,6 +1,5 @@
 import 'package:blogs/admin.dart';
 import 'package:blogs/function/messenger.dart';
-import 'package:blogs/function/userdata.dart';
 import 'package:blogs/register.dart';
 import 'package:blogs/widgets/customhero.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,7 +16,6 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   Messenger msg = Messenger();
-  Userdata userdata = Userdata();
   User? user = FirebaseAuth.instance.currentUser;
 
   final TextEditingController _email = TextEditingController();
@@ -163,11 +161,19 @@ class _ProfileState extends State<Profile> {
   late Future userFuture;
 
   Future _userData() async {
-    DocumentSnapshot<Map<String, dynamic>> userDoc = await userdata.getData(user!.uid);
+    DocumentSnapshot<Map<String, dynamic>>? userDoc;
+
+    try {
+      // trying to get it from cache first
+      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.cache));
+    } catch(error) {
+      // get from server if cache fails
+      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.server));
+    }
 
     if (userDoc.data()!.isNotEmpty) {
       setState(() {
-        _email.text = userDoc.data()!['email'];
+        _email.text = userDoc!.data()!['email'];
         _username.text = userDoc.data()!['username'];
         _birthday.text = userDoc.data()!['birthday'];
         university = userDoc.data()!['university'];

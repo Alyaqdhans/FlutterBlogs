@@ -1,6 +1,5 @@
 import 'package:blogs/edit.dart';
 import 'package:blogs/function/messenger.dart';
-import 'package:blogs/function/userdata.dart';
 import 'package:blogs/widgets/preview.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,8 +9,7 @@ import 'package:intl/intl.dart';
 
 class BlogCard extends StatefulWidget {
   final AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot;
-  final bool checkAdmin;
-  const BlogCard({super.key, required this.snapshot, required this.checkAdmin});
+  const BlogCard({super.key, required this.snapshot});
 
   @override
   State<BlogCard> createState() => _BlogCardState();
@@ -19,22 +17,25 @@ class BlogCard extends StatefulWidget {
 
 class _BlogCardState extends State<BlogCard> {
   Messenger msg = Messenger();
-  Userdata userdata = Userdata();
   User? user = FirebaseAuth.instance.currentUser;
   bool isAdmin = false;
+  List userBlogs = [];
 
-  Future checkIsAdmin(uid) async {
+  Future userData(uid) async {
+    DocumentSnapshot<Map<String, dynamic>>? userDoc;
+
     try {
-      DocumentSnapshot<Map<String, dynamic>> userDoc = await userdata.getData(user!.uid);
-      
-      if (userDoc.data()!.isNotEmpty) {
-        setState(() {
-          isAdmin = userDoc.data()!['admin'];
-        });
-      }
-    } catch (e) {
+      // trying to get it from cache first
+      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.cache));
+    } catch(error) {
+      // get from server if cache fails
+      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.server));
+    }
+    
+    if (userDoc.data()!.isNotEmpty) {
       setState(() {
-        isAdmin = false;
+        isAdmin = userDoc!.data()!['admin'];
+        userBlogs = userDoc.data()!['blogs'];
       });
     }
   }
@@ -44,18 +45,24 @@ class _BlogCardState extends State<BlogCard> {
     super.initState();
 
     if (user == null) return;
-    if (widget.checkAdmin) {
-      checkIsAdmin(user!.uid);
-    }
+    userData(user!.uid);
   }
 
   @override
   Widget build(BuildContext context) {
+    // Sort the documents by the 'date' field in descending order
+    var sortedDocs = widget.snapshot.data!.docs;
+    sortedDocs.sort((a, b) {
+      DateTime dateA = (a['date'] as Timestamp).toDate();
+      DateTime dateB = (b['date'] as Timestamp).toDate();
+      return dateB.compareTo(dateA); // Descending order
+    });
+
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(10, 20, 10, 90),
-      itemCount: widget.snapshot.data!.docs.length,
+      itemCount: sortedDocs.length,
       itemBuilder: (context, index) {
-        var blogData = widget.snapshot.data!.docs[index];
+        var blogData = sortedDocs[index];
 
         var userId = blogData['userid'];
         var username = blogData['username'];
@@ -74,7 +81,7 @@ class _BlogCardState extends State<BlogCard> {
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withOpacity(0.15),
                   blurRadius: 5,
                 ),
               ],
@@ -101,24 +108,27 @@ class _BlogCardState extends State<BlogCard> {
                           ),
                         ),
                         
-                        Row(
-                          children: [
-                            Text(
-                              favorites.toString(),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold
-                              )
-                            ),
-
-                            // Favorite
-                            IconButton(
-                              tooltip: 'Favorite',
-                              onPressed: () {
-                                
-                              },
-                              icon: const Icon(Icons.star_border)
-                            ),
-                          ],
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Row(
+                            children: [
+                              Text(
+                                favorites.toString(),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold
+                                )
+                              ),
+                          
+                              // Favorite
+                              IconButton(
+                                tooltip: 'Favorite',
+                                onPressed: () {
+                                  
+                                },
+                                icon: const Icon(Icons.star_border)
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -190,88 +200,106 @@ class _BlogCardState extends State<BlogCard> {
 
                     const SizedBox(height: 10),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Tags
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 4,
-                          children: tags.map((tag) {
-                            return Chip(
-                              label: Text(
-                                tag,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 13
-                                )
-                              ),
-                              backgroundColor: Colors.teal,
-                              side: BorderSide.none,
-                            );
-                          }).toList(),
-                        ),
-
-                        if (user != null && user!.uid == userId || isAdmin == true)
-                          // Expand Menu
-                          PopupMenuButton(
-                            elevation: 7,
-                            tooltip: 'Extra',
-                            icon: const Icon(Icons.more_vert),
-                            onSelected: (value) async {
-                              if (value == 'Edit') {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                  return Edit(
-                                    blogData: blogData,
-                                    userData: [userId, username]
-                                  );
-                                }));
-                              } else if (value == 'Delete') {
-                                final result = await msg.showBottomAction(
-                                  context,
-                                  'Are you sure you want to delete?',
-                                  'This will delete the current blog forever, and ther is no going back!',
-                                  'Permanently Delete',
-                                  Colors.red[700]
-                                );
-
-                                if (result == true) {
-                                  await FirebaseFirestore.instance.collection('blogs').doc(id).delete();
-                                }
-                              }
-                            },
-                            itemBuilder: (context) => [
-                              const PopupMenuItem(
-                                value: 'Edit',
-                                child: ListTile(
-                                  leading: Icon(Icons.edit, color: Colors.blue),
-                                  title: Text(
-                                    'Edit',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blue
-                                    )
+                    SizedBox(
+                      height: 40,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Tags
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: SingleChildScrollView(
+                                    padding: const EdgeInsets.only(right: 50),
+                                    scrollDirection: Axis.horizontal,
+                                    child: Wrap(
+                                      spacing: 8,
+                                      runSpacing: 4,
+                                      children: tags.map((tag) {
+                                        return Chip(
+                                          label: Text(
+                                            tag,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                          backgroundColor: Colors.teal,
+                                          side: BorderSide.none,
+                                        );
+                                      }).toList(),
+                                    ),
                                   ),
                                 ),
-                              ),
-
-                              const PopupMenuItem(
-                                value: 'Delete',
-                                child: ListTile(
-                                  leading: Icon(Icons.delete, color: Colors.red),
-                                  title: Text(
-                                    'Delete',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.red
-                                    )
+                      
+                                // Extra options
+                                if (user != null && user!.uid == userId || isAdmin == true)
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Material(
+                                      color: Colors.white,
+                                      shape: const RoundedRectangleBorder(),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 5),
+                                        child: PopupMenuButton(
+                                          elevation: 7,
+                                          tooltip: 'Extra',
+                                          icon: const Icon(Icons.more_vert),
+                                          onSelected: (value) async {
+                                            if (value == 'Edit') {
+                                              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                                return Edit(blogData: blogData);
+                                              }));
+                                            } else if (value == 'Delete') {
+                                              final result = await msg.showBottomAction(
+                                                context,
+                                                'Are you sure you want to delete?',
+                                                'This will delete the current blog forever, and there is no going back!',
+                                                'Permanently Delete',
+                                                Colors.red[700],
+                                              );
+                                        
+                                              if (result == true) {
+                                                await FirebaseFirestore.instance.collection('blogs').doc(id).delete();
+                                              }
+                                            }
+                                          },
+                                          itemBuilder: (context) => [
+                                            const PopupMenuItem(
+                                              value: 'Edit',
+                                              child: ListTile(
+                                                leading: Icon(Icons.edit, color: Colors.blue),
+                                                title: Text(
+                                                  'Edit',
+                                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                                                ),
+                                              ),
+                                            ),
+                      
+                                            const PopupMenuItem(
+                                              value: 'Delete',
+                                              child: ListTile(
+                                                leading: Icon(Icons.delete, color: Colors.red),
+                                                title: Text(
+                                                  'Delete',
+                                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),
