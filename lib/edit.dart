@@ -1,3 +1,4 @@
+import 'package:blogs/function/dropdowndata.dart';
 import 'package:blogs/function/messenger.dart';
 import 'package:blogs/widgets/hint.dart';
 import 'package:blogs/widgets/preview.dart';
@@ -16,13 +17,14 @@ class Edit extends StatefulWidget {
 class _EditState extends State<Edit> {
   User? user = FirebaseAuth.instance.currentUser;
   Messenger msg = Messenger();
+  DropdownData ddd = DropdownData();
 
   final TextEditingController _title = TextEditingController();
   final TextEditingController _content = TextEditingController();
   String? university;
-  List universities = ["UTAS", "UNizwa", "SQU", "MEC"];
+  List? universities;
   String? department;
-  List departments = ["IT", "Engineering", "Business", "English", "Math", "Fashion", "Pharmacy", "Photography"];
+  List? departments;
   final TextEditingController _course = TextEditingController();
   
   bool isLoading = false;
@@ -60,6 +62,13 @@ class _EditState extends State<Edit> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    universities = ddd.getUniversities();
+    departments = ddd.getDepartments();
+  }
+
+  @override
   void dispose() {
     _title.dispose();
     _content.dispose();
@@ -77,6 +86,8 @@ class _EditState extends State<Edit> {
     department = departmentBlog;
     
     return Scaffold(
+      backgroundColor: Colors.grey[200],
+
       appBar: AppBar(
         title: const Text('Edit Blog'),
         centerTitle: true,
@@ -172,7 +183,7 @@ class _EditState extends State<Edit> {
                         isExpanded: true,
                         borderRadius: BorderRadius.circular(15),
                         value: universityBlog,
-                        items: universities.map((e) {
+                        items: universities!.map((e) {
                           return DropdownMenuItem(
                             value: e,
                             child: Text(e)
@@ -197,7 +208,7 @@ class _EditState extends State<Edit> {
                         isExpanded: true,
                         borderRadius: BorderRadius.circular(15),
                         value: departmentBlog,
-                        items: departments.map((e) {
+                        items: departments!.map((e) {
                           return DropdownMenuItem(
                             value: e,
                             child: Text(e)

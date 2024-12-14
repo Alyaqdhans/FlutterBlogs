@@ -1,4 +1,5 @@
 import 'package:blogs/admin.dart';
+import 'package:blogs/function/dropdowndata.dart';
 import 'package:blogs/function/messenger.dart';
 import 'package:blogs/register.dart';
 import 'package:blogs/widgets/customhero.dart';
@@ -16,6 +17,7 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   Messenger msg = Messenger();
+  DropdownData ddd = DropdownData();
   User? user = FirebaseAuth.instance.currentUser;
 
   final TextEditingController _email = TextEditingController();
@@ -23,7 +25,7 @@ class _ProfileState extends State<Profile> {
   final TextEditingController _username = TextEditingController();
   final TextEditingController _birthday = TextEditingController();
   String? university;
-  List universities = ["UTAS", "UNizwa", "SQU", "MEC"];
+  List? universities;
   bool? isAdmin;
 
   bool hidePassword = true;
@@ -185,6 +187,8 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
+
+    universities = ddd.getUniversities();
 
     if (!mounted) return; // if page is closed
     if (user == null) {
@@ -490,8 +494,8 @@ class _ProfileState extends State<Profile> {
                               title: DropdownButtonFormField(
                                 isExpanded: true,
                                 borderRadius: BorderRadius.circular(15),
-                                value: (university != "" ? university : null), // handle if no value found in database
-                                items: universities.map((e) {
+                                value: university,
+                                items: universities!.map((e) {
                                   return DropdownMenuItem(
                                     value: e,
                                     child: Text(e),

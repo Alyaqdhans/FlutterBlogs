@@ -1,3 +1,4 @@
+import 'package:blogs/function/dropdowndata.dart';
 import 'package:blogs/function/messenger.dart';
 import 'package:blogs/widgets/hint.dart';
 import 'package:blogs/widgets/preview.dart';
@@ -15,13 +16,14 @@ class Create extends StatefulWidget {
 class _CreateState extends State<Create> {
   User? user = FirebaseAuth.instance.currentUser;
   Messenger msg = Messenger();
+  DropdownData ddd = DropdownData();
 
   final TextEditingController _title = TextEditingController();
   final TextEditingController _content = TextEditingController();
   String? university;
-  List universities = ["UTAS", "UNizwa", "SQU", "MEC"];
+  List? universities;
   String? department;
-  List departments = ["IT", "Engineering", "Business", "English", "Math", "Fashion", "Pharmacy", "Photography"];
+  List? departments;
   final TextEditingController _course = TextEditingController();
 
   bool isLoading = false;
@@ -60,6 +62,13 @@ class _CreateState extends State<Create> {
         isLoading = false;
       });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    universities = ddd.getUniversities();
+    departments = ddd.getDepartments();
   }
 
   @override
@@ -168,7 +177,7 @@ class _CreateState extends State<Create> {
                       title: DropdownButtonFormField(
                         isExpanded: true,
                         borderRadius: BorderRadius.circular(15),
-                        items: universities.map((e) {
+                        items: universities!.map((e) {
                           return DropdownMenuItem(
                             value: e,
                             child: Text(e)
@@ -192,7 +201,7 @@ class _CreateState extends State<Create> {
                       title: DropdownButtonFormField(
                         isExpanded: true,
                         borderRadius: BorderRadius.circular(15),
-                        items: departments.map((e) {
+                        items: departments!.map((e) {
                           return DropdownMenuItem(
                             value: e,
                             child: Text(e)

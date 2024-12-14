@@ -18,10 +18,10 @@ class BlogCard extends StatefulWidget {
 class _BlogCardState extends State<BlogCard> {
   Messenger msg = Messenger();
   User? user = FirebaseAuth.instance.currentUser;
-  bool isAdmin = false;
-  List userBlogs = [];
+  bool? isAdmin;
+  List? userBlogs;
 
-  Future userData(uid) async {
+  Future userData() async {
     DocumentSnapshot<Map<String, dynamic>>? userDoc;
 
     try {
@@ -45,7 +45,7 @@ class _BlogCardState extends State<BlogCard> {
     super.initState();
 
     if (user == null) return;
-    userData(user!.uid);
+    userData();
   }
 
   @override
@@ -65,7 +65,16 @@ class _BlogCardState extends State<BlogCard> {
         var date = (blogData['date'] as Timestamp).toDate();
         var isEdited = blogData['isEdited'];
         var lastEdited = (blogData['lastEdited'] as Timestamp).toDate();
-        var favorites = blogData['favorites'];
+        var favorites = blogData['favorites'] as int;
+
+        bool? isFavorite;
+        if (userBlogs != null) {
+          if (userBlogs!.contains(id)) {
+            isFavorite = true;
+          } else {
+            isFavorite = false;
+          }
+        }
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -87,42 +96,71 @@ class _BlogCardState extends State<BlogCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            title,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                    SizedBox(
+                      height: 40,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
-                        ),
-                        
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Row(
-                            children: [
-                              Text(
-                                favorites.toString(),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold
-                                )
-                              ),
                           
-                              // Favorite
-                              IconButton(
-                                tooltip: 'Favorite',
-                                onPressed: () {
-                                  
-                                },
-                                icon: const Icon(Icons.star_border)
-                              ),
-                            ],
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Row(
+                              children: [
+                                Text(
+                                  favorites.toString(),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold
+                                  )
+                                ),
+                            
+                                // Favorite
+                                (isFavorite == null)
+                                ? const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 10),
+                                      child: SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator()
+                                      ),
+                                    )
+                                : IconButton(
+                                    tooltip: 'Favorite',
+                                    onPressed: (user == null)
+                                    ? null
+                                    : () async {
+                                      setState(() {
+                                        if (isFavorite == false) {
+                                          isFavorite = true;
+                                          favorites++;
+                                          userBlogs!.add(id);
+                                        } else {
+                                          isFavorite = false;
+                                          favorites--;
+                                          userBlogs!.remove(id);
+                                        }
+                                      });
+                      
+                                      await FirebaseFirestore.instance.collection('blogs').doc(id).update({'favorites': favorites});
+                                      await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({'blogs': userBlogs});
+                                    },
+                                    icon: (isFavorite == true)
+                                    ? const Icon(Icons.star, color: Colors.redAccent)
+                                    : const Icon(Icons.star_border)
+                                  ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
 
                     const Divider(color: Colors.blue),
@@ -226,66 +264,79 @@ class _BlogCardState extends State<BlogCard> {
                                     ),
                                   ),
                                 ),
-                      
+                                
                                 // Extra options
-                                if (user != null && user!.uid == userId || isAdmin == true)
-                                  Align(
+                                (isAdmin == null)
+                                ? const Align(
                                     alignment: Alignment.centerRight,
-                                    child: Material(
-                                      color: Colors.white,
-                                      shape: const RoundedRectangleBorder(),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 5),
-                                        child: PopupMenuButton(
-                                          elevation: 7,
-                                          tooltip: 'Extra',
-                                          icon: const Icon(Icons.more_vert),
-                                          onSelected: (value) async {
-                                            if (value == 'Edit') {
-                                              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                                return Edit(blogData: blogData);
-                                              }));
-                                            } else if (value == 'Delete') {
-                                              final result = await msg.showBottomAction(
-                                                context,
-                                                'Are you sure you want to delete?',
-                                                'This will delete the current blog forever, and there is no going back!',
-                                                'Permanently Delete',
-                                                Colors.red[700],
-                                              );
-                                        
-                                              if (result == true) {
-                                                await FirebaseFirestore.instance.collection('blogs').doc(id).delete();
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator()
+                                        ),
+                                      ),
+                                )
+                                : (user == null || !(user!.uid == userId || isAdmin == true))
+                                  ? const SizedBox.shrink()
+                                  : Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Material(
+                                        color: Colors.white,
+                                        shape: const RoundedRectangleBorder(),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 5),
+                                          child: PopupMenuButton(
+                                            elevation: 7,
+                                            tooltip: 'Extra',
+                                            icon: const Icon(Icons.more_vert),
+                                            onSelected: (value) async {
+                                              if (value == 'Edit') {
+                                                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                                  return Edit(blogData: blogData);
+                                                }));
+                                              } else if (value == 'Delete') {
+                                                final result = await msg.showBottomAction(
+                                                  context,
+                                                  'Are you sure you want to delete?',
+                                                  'This will delete the current blog forever, and there is no going back!',
+                                                  'Permanently Delete',
+                                                  Colors.red[700],
+                                                );
+                                          
+                                                if (result == true) {
+                                                  await FirebaseFirestore.instance.collection('blogs').doc(id).delete();
+                                                }
                                               }
-                                            }
-                                          },
-                                          itemBuilder: (context) => [
-                                            const PopupMenuItem(
-                                              value: 'Edit',
-                                              child: ListTile(
-                                                leading: Icon(Icons.edit, color: Colors.blue),
-                                                title: Text(
-                                                  'Edit',
-                                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                                            },
+                                            itemBuilder: (context) => [
+                                              const PopupMenuItem(
+                                                value: 'Edit',
+                                                child: ListTile(
+                                                  leading: Icon(Icons.edit, color: Colors.blue),
+                                                  title: Text(
+                                                    'Edit',
+                                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                      
-                                            const PopupMenuItem(
-                                              value: 'Delete',
-                                              child: ListTile(
-                                                leading: Icon(Icons.delete, color: Colors.red),
-                                                title: Text(
-                                                  'Delete',
-                                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                        
+                                              const PopupMenuItem(
+                                                value: 'Delete',
+                                                child: ListTile(
+                                                  leading: Icon(Icons.delete, color: Colors.red),
+                                                  title: Text(
+                                                    'Delete',
+                                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
                               ],
                             ),
                           ),

@@ -1,3 +1,4 @@
+import 'package:blogs/function/dropdowndata.dart';
 import 'package:blogs/function/messenger.dart';
 import 'package:blogs/main.dart';
 import 'package:blogs/widgets/customhero.dart';
@@ -15,14 +16,15 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   Messenger msg = Messenger();
+  DropdownData ddd = DropdownData();
 
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
   final TextEditingController _confirm = TextEditingController();
   final TextEditingController _username = TextEditingController();
   final TextEditingController _birthday = TextEditingController();
-  String university = "";
-  List universities = ["UTAS", "UNizwa", "SQU", "MEC"];
+  String? university;
+  List? universities;
 
   bool hidePassword = true;
   bool hideConfirm = true;
@@ -72,6 +74,12 @@ class _RegisterState extends State<Register> {
         isLoading = false;
       });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    universities = ddd.getUniversities();
   }
 
   @override
@@ -236,7 +244,7 @@ class _RegisterState extends State<Register> {
                       title: DropdownButtonFormField(
                         isExpanded: true,
                         borderRadius: BorderRadius.circular(15),
-                        items: universities.map((e) {
+                        items: universities!.map((e) {
                           return DropdownMenuItem(
                             value: e,
                             child: Text(e),
