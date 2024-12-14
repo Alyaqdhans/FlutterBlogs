@@ -123,7 +123,7 @@ class _BlogCardState extends State<BlogCard> {
                                 ),
                             
                                 // Favorite
-                                (isFavorite == null)
+                                (user != null && isFavorite == null)
                                 ? const Padding(
                                     padding: EdgeInsets.symmetric(horizontal: 10),
                                       child: SizedBox(
@@ -266,7 +266,7 @@ class _BlogCardState extends State<BlogCard> {
                                 ),
                                 
                                 // Extra options
-                                (isAdmin == null)
+                                (isAdmin == null && (user != null && username != user!.displayName))
                                 ? const Align(
                                     alignment: Alignment.centerRight,
                                     child: Padding(
