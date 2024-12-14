@@ -38,10 +38,9 @@ class _CreateState extends State<Create> {
       || department!.isEmpty
       || _course.text.trim().isEmpty) throw 'Some fields are empty';
 
-      DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(user!.uid);
-
       await FirebaseFirestore.instance.collection('blogs').add({
-        'userRef': userRef,
+        'userid': user!.uid,
+        'username': user!.displayName,
         'title': _title.text.trim(),
         'contents': _content.text.trim(),
         'tags': [university, department, _course.text.trim().toLowerCase()],
@@ -103,6 +102,7 @@ class _CreateState extends State<Create> {
                 child: Column(
                   children: [
                     TextFormField(
+                      maxLength: 30,
                       controller: _title,
                       decoration: InputDecoration(
                         labelText: 'Blog Title',
@@ -138,9 +138,17 @@ class _CreateState extends State<Create> {
                           ),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) {
-                              return PreviewMarkdown(contents: _content.text.trim(), tag: 'preview');
-                            }));
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) {
+                                return PreviewMarkdown(
+                                    contents: _content.text.trim(),
+                                    title: 'Preview',
+                                    tag: 'preview'
+                                  );
+                                }
+                              )
+                            );
                           },
                         ),
                       ),

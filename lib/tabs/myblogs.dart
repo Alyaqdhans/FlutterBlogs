@@ -12,29 +12,6 @@ class Myblogs extends StatefulWidget {
 
 class _MyblogsState extends State<Myblogs> {
   User? user = FirebaseAuth.instance.currentUser;
-  String? ref;
-
-  Future getPath(uid) async {
-    try {
-      var userDoc = FirebaseFirestore.instance.collection('users').doc(uid);
-      
-      setState(() {
-        ref = userDoc.path;
-      });
-    } catch (e) {
-      setState(() {
-        ref = null;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (user == null) return;
-    getPath(user!.uid);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +41,11 @@ class _MyblogsState extends State<Myblogs> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.grey[200],
+
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('blogs').orderBy('date', descending: true)
-          .where('userRef', isEqualTo: ref).snapshots(),
+          .where('userid', isEqualTo: user!.uid).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -126,7 +105,7 @@ class _MyblogsState extends State<Myblogs> {
             );
           }
 
-          return BlogCard(snapshot: snapshot);
+          return BlogCard(snapshot: snapshot, checkAdmin: false);
         }
       ),
     );

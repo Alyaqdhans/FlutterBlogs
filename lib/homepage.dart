@@ -28,6 +28,8 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
+
       body: TabBarView(
         controller: _tabController,
         children: const [

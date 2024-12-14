@@ -10,8 +10,10 @@ class Favorites extends StatefulWidget {
 class _FavoritesState extends State<Favorites> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Column(
+    return Scaffold(
+      backgroundColor: Colors.grey[200],
+
+      body: const Column(
         children: [
           Text('Favorites')
         ],

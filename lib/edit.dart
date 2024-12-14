@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class Edit extends StatefulWidget {
   final QueryDocumentSnapshot<Map<String, dynamic>> blogData;
-  final DocumentSnapshot<Object?>? userData;
+  final List userData;
   const Edit({super.key, required this.blogData, required this.userData});
 
   @override
@@ -13,7 +13,8 @@ class Edit extends StatefulWidget {
 class _EditState extends State<Edit> {
   @override
   Widget build(BuildContext context) {
-    var username = widget.userData!['username'];
+    var userId = widget.userData[0];
+    var username = widget.userData[1];
 
     var id = widget.blogData.id;
     var title = widget.blogData['title'];

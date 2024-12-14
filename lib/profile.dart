@@ -92,6 +92,19 @@ class _ProfileState extends State<Profile> {
 
       await user?.updateDisplayName(_username.text.trim());
 
+      // Get user blogs
+      QuerySnapshot<Map<String, dynamic>> userBlogs = await FirebaseFirestore.instance.collection('blogs')
+        .where('userid', isEqualTo: user!.uid).get();
+      // Create a batch instance
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+      // Add updates to the batch
+      for (var doc in userBlogs.docs) {
+        DocumentReference docRef = FirebaseFirestore.instance.collection('blogs').doc(doc.id);
+        batch.update(docRef, {'username': _username.text.trim()});
+      }
+      // Commit the batch
+      await batch.commit();
+
       msg.success(context, Icons.check, 'Updated successfully!', Colors.green);
     } catch(error) {
       msg.failed(context, Icons.close, error, Colors.red);
@@ -180,6 +193,8 @@ class _ProfileState extends State<Profile> {
     // when user is in guest account
     if (user == null) {
       return Scaffold(
+        backgroundColor: Colors.grey[200],
+
         appBar: AppBar(
           title: const Text('Guest'),
           centerTitle: true,
@@ -343,6 +358,8 @@ class _ProfileState extends State<Profile> {
     
     // when user is logged in
     return Scaffold(
+      backgroundColor: Colors.grey[200],
+
       appBar: AppBar(
         title: const Text('Profile'),
         centerTitle: true,

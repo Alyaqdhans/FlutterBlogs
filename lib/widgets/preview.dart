@@ -4,8 +4,9 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 
 class PreviewMarkdown extends StatefulWidget {
   final String contents;
+  final String title;
   final String tag;
-  const PreviewMarkdown({super.key, required this.contents, required this.tag});
+  const PreviewMarkdown({super.key, required this.contents, required this.tag, required this.title});
 
   @override
   State<PreviewMarkdown> createState() => _PreviewMarkdownState();
@@ -20,7 +21,7 @@ class _PreviewMarkdownState extends State<PreviewMarkdown> {
       backgroundColor: Colors.grey[200],
     
       appBar: AppBar(
-        title: const Text('Preview'),
+        title: Text(widget.title),
         centerTitle: true,
         backgroundColor: Colors.grey[800],
         foregroundColor: Colors.white,

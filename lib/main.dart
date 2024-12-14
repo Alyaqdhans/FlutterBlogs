@@ -36,7 +36,6 @@ void main() async {
     home: const Home(),
     theme: ThemeData(
       useMaterial3: true,
-      primaryColor: Colors.blue,
       
       colorScheme: const ColorScheme.light(
         primary: Colors.blue,

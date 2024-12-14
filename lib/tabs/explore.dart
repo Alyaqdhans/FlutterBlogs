@@ -16,6 +16,8 @@ class _ExploreState extends State<Explore> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
+      
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('blogs').orderBy('date', descending: true).snapshots(),
         builder: (context, snapshot) {
@@ -77,7 +79,7 @@ class _ExploreState extends State<Explore> {
             );
           }
 
-          return BlogCard(snapshot: snapshot);
+          return BlogCard(snapshot: snapshot, checkAdmin: true);
         }
       ),
     );
