@@ -1,5 +1,9 @@
+import 'package:blogs/edit.dart';
+import 'package:blogs/function/messenger.dart';
+import 'package:blogs/function/userdata.dart';
 import 'package:blogs/widgets/preview.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
@@ -13,6 +17,35 @@ class BlogCard extends StatefulWidget {
 }
 
 class _BlogCardState extends State<BlogCard> {
+  Messenger msg = Messenger();
+  Userdata userdata = Userdata();
+  User? user = FirebaseAuth.instance.currentUser;
+  bool isAdmin = false;
+
+  Future checkIsAdmin(uid) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> userDoc = await userdata.getData(user!.uid);
+      
+      if (userDoc.data()!.isNotEmpty) {
+        setState(() {
+          isAdmin = userDoc.data()!['admin'];
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isAdmin = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (user == null) return;
+    checkIsAdmin(user!.uid);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -51,6 +84,7 @@ class _BlogCardState extends State<BlogCard> {
               return const Text('User not found');
             }
 
+            var userData = userSnapshot.data;
             var username = userSnapshot.data!.get('username');
 
             return Padding(
@@ -113,9 +147,11 @@ class _BlogCardState extends State<BlogCard> {
                         const SizedBox(height: 8),
 
                         // Preview of Contents
-                        MarkdownBody(
-                          data: contents.length > 70 ? '${contents.substring(0, 100)}...' : contents,
-                          fitContent: false,
+                        ListTile(
+                          title: MarkdownBody(
+                            data: contents.length > 70 ? '${contents.substring(0, 100)}...' : contents,
+                            fitContent: false,
+                          ),
                         ),
 
                         const SizedBox(height: 8),
@@ -157,12 +193,12 @@ class _BlogCardState extends State<BlogCard> {
 
                         // Created and Edited Dates
                         Text(
-                          'Created on: ${DateFormat('d/M/y H:M a').format(date)}',
+                          'Created on: ${DateFormat('d/M/y h:m a').format(date)}',
                           style: const TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                         if (isEdited)
                           Text(
-                            'Edited on: ${DateFormat('d/M/y H:M a').format(lastEdited)}',
+                            'Edited on: ${DateFormat('d/M/y h:m a').format(lastEdited)}',
                             style: const TextStyle(color: Colors.grey, fontSize: 12),
                           ),
 
@@ -177,55 +213,77 @@ class _BlogCardState extends State<BlogCard> {
                               runSpacing: 4,
                               children: tags.map((tag) {
                                 return Chip(
-                                  label: Text(tag, style: const TextStyle(color: Colors.white)),
+                                  label: Text(
+                                    tag,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13
+                                    )
+                                  ),
                                   backgroundColor: Colors.teal,
                                   side: BorderSide.none,
                                 );
                               }).toList(),
                             ),
 
-                            // Expand Menu
-                            PopupMenuButton(
-                              elevation: 7,
-                              tooltip: 'Extra',
-                              icon: const Icon(Icons.more_vert),
-                              onSelected: (value) {
-                                if (value == 'Edit') {
-                                  // Handle edit action
-                                } else if (value == 'Delete') {
-                                  // Handle delete action
-                                }
-                              },
-                              itemBuilder: (context) => [
-                                const PopupMenuItem(
-                                  value: 'Edit',
-                                  child: ListTile(
-                                    leading: Icon(Icons.edit, color: Colors.blue),
-                                    title: Text(
-                                      'Edit',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blue
-                                      )
-                                    ),
-                                  ),
-                                ),
+                            if (user != null && user!.uid == userRef.id || isAdmin == true)
+                              // Expand Menu
+                              PopupMenuButton(
+                                elevation: 7,
+                                tooltip: 'Extra',
+                                icon: const Icon(Icons.more_vert),
+                                onSelected: (value) async {
+                                  if (value == 'Edit') {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                      return Edit(
+                                        blogData: blogData,
+                                        userData: userData
+                                      );
+                                    }));
+                                  } else if (value == 'Delete') {
+                                    final result = await msg.showBottomAction(
+                                      context,
+                                      'Are you sure you want to delete?',
+                                      'This will delete the current blog forever, and ther is no going back!',
+                                      'Permanently Delete',
+                                      Colors.red[700]
+                                    );
 
-                                const PopupMenuItem(
-                                  value: 'Delete',
-                                  child: ListTile(
-                                    leading: Icon(Icons.delete, color: Colors.red),
-                                    title: Text(
-                                      'Delete',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red
-                                      )
+                                    if (result == true) {
+                                      await FirebaseFirestore.instance.collection('blogs').doc(id).delete();
+                                    }
+                                  }
+                                },
+                                itemBuilder: (context) => [
+                                  const PopupMenuItem(
+                                    value: 'Edit',
+                                    child: ListTile(
+                                      leading: Icon(Icons.edit, color: Colors.blue),
+                                      title: Text(
+                                        'Edit',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.blue
+                                        )
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
+
+                                  const PopupMenuItem(
+                                    value: 'Delete',
+                                    child: ListTile(
+                                      leading: Icon(Icons.delete, color: Colors.red),
+                                      title: Text(
+                                        'Delete',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.red
+                                        )
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                           ],
                         ),
                       ],

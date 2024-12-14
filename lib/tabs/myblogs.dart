@@ -12,7 +12,29 @@ class Myblogs extends StatefulWidget {
 
 class _MyblogsState extends State<Myblogs> {
   User? user = FirebaseAuth.instance.currentUser;
-  DocumentReference ref = FirebaseFirestore.instance.doc('/users/${FirebaseAuth.instance.currentUser!.uid}');
+  String? ref;
+
+  Future getPath(uid) async {
+    try {
+      var userDoc = FirebaseFirestore.instance.collection('users').doc(uid);
+      
+      setState(() {
+        ref = userDoc.path;
+      });
+    } catch (e) {
+      setState(() {
+        ref = null;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (user == null) return;
+    getPath(user!.uid);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +45,13 @@ class _MyblogsState extends State<Myblogs> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.logout,
+              Icons.lock,
               color: Colors.blue,
               size: 60,
             ),
             
             Text(
-              'You have to be logged in',
+              'For logged in users only',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 30,
@@ -43,7 +65,8 @@ class _MyblogsState extends State<Myblogs> {
 
     return Scaffold(
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('blogs').orderBy('date', descending: true).where('userRef', isEqualTo: ref).snapshots(),
+        stream: FirebaseFirestore.instance.collection('blogs').orderBy('date', descending: true)
+          .where('userRef', isEqualTo: ref).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(

@@ -64,6 +64,13 @@ class _CreateState extends State<Create> {
   }
 
   @override
+  void dispose() {
+    _title.dispose();
+    _content.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
@@ -89,7 +96,7 @@ class _CreateState extends State<Create> {
         padding: const EdgeInsets.only(bottom: 60),
         children: [
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
             child: Card(
               child: Padding(
                 padding: const EdgeInsets.all(30),
@@ -106,6 +113,7 @@ class _CreateState extends State<Create> {
                     const SizedBox(height: 10),
                     
                     TextFormField(
+                      maxLength: 2000,
                       maxLines: 10,
                       controller: _content,
                       decoration: InputDecoration(

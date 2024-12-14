@@ -45,36 +45,32 @@ class _PreviewMarkdownState extends State<PreviewMarkdown> {
                 padding: const EdgeInsets.all(10),
                 child: MarkdownBody(
                   data: widget.contents,
-                  fitContent: false
+                  fitContent: false,
+                  selectable: true,
                 )
               ),
             ),
           ],
         )
-      : Center(
-          child: Card(
-            child: Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
-              child: const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.visibility_off,
-                    color: Colors.blue,
-                    size: 70,
-                  ),
-                  
-                  Text(
-                    'No contents to preview',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+      : const Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.visibility_off,
+                color: Colors.blue,
+                size: 70,
               ),
-            ),
+              
+              Text(
+                'No contents to preview',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         )
     );

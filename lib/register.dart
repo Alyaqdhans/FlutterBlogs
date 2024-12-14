@@ -1,4 +1,5 @@
 import 'package:blogs/function/messenger.dart';
+import 'package:blogs/main.dart';
 import 'package:blogs/widgets/customhero.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -60,7 +61,9 @@ class _RegisterState extends State<Register> {
 
       msg.success(context, Icons.check, 'Registred successfully!', Colors.green);
 
-      Navigator.pop(context);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+        return const Home();
+      }));
     } catch(error) {
       msg.failed(context, Icons.close, error, Colors.red);
     } finally {
@@ -192,6 +195,7 @@ class _RegisterState extends State<Register> {
 
                     ListTile(
                       title: TextFormField(
+                        maxLength: 20,
                         controller: _username,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.person),

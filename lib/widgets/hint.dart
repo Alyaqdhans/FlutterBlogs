@@ -140,7 +140,7 @@ This web site is using `markedjs/marked`.
           children: [
             ListView(
               shrinkWrap: true,
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 80),
+              padding: const EdgeInsets.fromLTRB(10, 20, 10, 80),
               children: [
                 Card(
                   child: Padding(
@@ -155,7 +155,7 @@ This web site is using `markedjs/marked`.
             ),
     
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 80),
+              padding: const EdgeInsets.fromLTRB(10, 20, 10, 80),
               child: Card(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
