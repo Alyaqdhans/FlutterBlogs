@@ -114,6 +114,7 @@ class _BlogCardState extends State<BlogCard> {
                           Padding(
                             padding: const EdgeInsets.only(left: 10),
                             child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
                                   favorites.toString(),
@@ -137,17 +138,15 @@ class _BlogCardState extends State<BlogCard> {
                                     onPressed: (user == null)
                                     ? null
                                     : () async {
-                                      setState(() {
-                                        if (isFavorite == false) {
-                                          isFavorite = true;
-                                          favorites++;
-                                          userBlogs!.add(id);
-                                        } else {
-                                          isFavorite = false;
-                                          favorites--;
-                                          userBlogs!.remove(id);
-                                        }
-                                      });
+                                      if (isFavorite == false) {
+                                        isFavorite = true;
+                                        favorites++;
+                                        userBlogs!.add(id);
+                                      } else {
+                                        isFavorite = false;
+                                        favorites--;
+                                        userBlogs!.remove(id);
+                                      }
                       
                                       await FirebaseFirestore.instance.collection('blogs').doc(id).update({'favorites': favorites});
                                       await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({'blogs': userBlogs});
@@ -171,15 +170,16 @@ class _BlogCardState extends State<BlogCard> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: MarkdownBody(
-                        data: contents.length > 70 ? '${contents.substring(0, 100)}...' : contents,
+                        data: contents.length > 100 ? '${contents.substring(0, 100)}...' : contents,
                         fitContent: false,
                       ),
                     ),
 
-                    const SizedBox(height: 8),
+                    if (contents.length > 100)
+                      const SizedBox(height: 8),
 
                     // Floating Action Button for Read More
-                    if (contents.length > 70)
+                    if (contents.length > 100)
                       Center(
                         child: SizedBox(
                           height: 30,
@@ -219,21 +219,22 @@ class _BlogCardState extends State<BlogCard> {
 
                     // Created and Edited Dates
                     Text(
-                      'Created on: ${DateFormat('d/M/y h:m a').format(date)}',
+                      'Created on: ${DateFormat('d/M/y h:mm a').format(date)}',
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                     if (isEdited)
                       Text(
-                        'Edited on: ${DateFormat('d/M/y h:m a').format(lastEdited)}',
+                        'Edited on: ${DateFormat('d/M/y h:mm a').format(lastEdited)}',
                         style: const TextStyle(color: Colors.grey, fontSize: 12),
                       ),
 
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 5),
 
                     SizedBox(
                       height: 40,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Expanded(
                             child: Stack(
@@ -342,7 +343,9 @@ class _BlogCardState extends State<BlogCard> {
                           ),
                         ],
                       ),
-                    )
+                    ),
+
+                    const SizedBox(height: 5),
                   ],
                 ),
               ),

@@ -64,7 +64,6 @@ class _ProfileState extends State<Profile> {
       });
 
       msg.success(context, Icons.check, 'Logged in successfully!', Colors.green);
-      await _userData(); // update user info
 
     } catch(error) {
       msg.failed(context, Icons.close, error, Colors.red);
@@ -160,29 +159,7 @@ class _ProfileState extends State<Profile> {
   }
 
   // moved method and values outside builder so it only run once
-  late Future userFuture;
-
-  Future _userData() async {
-    DocumentSnapshot<Map<String, dynamic>>? userDoc;
-
-    try {
-      // trying to get it from cache first
-      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.cache));
-    } catch(error) {
-      // get from server if cache fails
-      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.server));
-    }
-
-    if (userDoc.data()!.isNotEmpty) {
-      setState(() {
-        _email.text = userDoc!.data()!['email'];
-        _username.text = userDoc.data()!['username'];
-        _birthday.text = userDoc.data()!['birthday'];
-        university = userDoc.data()!['university'];
-        isAdmin = userDoc.data()!['admin'];
-      });
-    }
-  }
+  late final Stream<QuerySnapshot> userStream;
 
   @override
   void initState() {
@@ -191,11 +168,18 @@ class _ProfileState extends State<Profile> {
     universities = ddd.getUniversities();
 
     if (!mounted) return; // if page is closed
-    if (user == null) {
-      userFuture = Future.value(); // an empty future to avoid late initialization error
-      return;
-    }
-    userFuture = _userData(); // cache the future so it doesn't refresh when using components like dropdownmenu
+    if (user == null) return;
+
+    userStream = FirebaseFirestore.instance.collection('users')
+    .where('email', isEqualTo: user!.email).snapshots();
+    userStream.first.then((snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        _email.text = snapshot.docs[0]['email'];
+        _username.text = snapshot.docs[0]['username'];
+        _birthday.text = snapshot.docs[0]['birthday'];
+        university = snapshot.docs[0]['university'];
+      }
+    });
   }
 
   @override
@@ -426,9 +410,9 @@ class _ProfileState extends State<Profile> {
                       ),
                     ),
 
-                    FutureBuilder(
-                      future: userFuture,
-                      builder: (context, snapshot) {
+                    StreamBuilder(
+                      stream: userStream,
+                      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return const Center(
                             child: Padding(
@@ -437,6 +421,22 @@ class _ProfileState extends State<Profile> {
                             ),
                           );
                         }
+
+                        if (snapshot.data!.docs.isEmpty) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 30),
+                              child: Text('(no user data were found)'),
+                            ),
+                          );
+                        }
+
+                        // update admin value realtime
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          setState(() {
+                            isAdmin = snapshot.data!.docs[0]['admin'];
+                          });
+                        });
 
                         return Column(
                           children: [

@@ -175,7 +175,7 @@ class _AdminState extends State<Admin> {
                           Switch(
                             activeColor: Colors.green[800],
                             value: isAdmin,
-                            onChanged: (user!.uid == id || !isActive)
+                            onChanged: (user!.uid == id)
                             ? null
                             : (value) async {
                                 await FirebaseFirestore.instance.collection('users').doc(id).update({'admin': value});
