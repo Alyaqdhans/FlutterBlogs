@@ -158,8 +158,8 @@ class _ProfileState extends State<Profile> {
     super.dispose();
   }
 
-  // moved method and values outside builder so it only run once
-  late final Stream<QuerySnapshot> userStream;
+  // moved stream outside builder so it only run once
+  late final Stream<DocumentSnapshot<Map<String, dynamic>>> userStream;
 
   @override
   void initState() {
@@ -170,14 +170,21 @@ class _ProfileState extends State<Profile> {
     if (!mounted) return; // if page is closed
     if (user == null) return;
 
-    userStream = FirebaseFirestore.instance.collection('users')
-    .where('email', isEqualTo: user!.email).snapshots();
-    userStream.first.then((snapshot) {
-      if (snapshot.docs.isNotEmpty) {
-        _email.text = snapshot.docs[0]['email'];
-        _username.text = snapshot.docs[0]['username'];
-        _birthday.text = snapshot.docs[0]['birthday'];
-        university = snapshot.docs[0]['university'];
+    // caching stream in variable so it doesnt refresh
+    userStream = FirebaseFirestore.instance.collection('users').doc(user!.uid).snapshots();
+    
+    // listen to user data from stream and update them
+    userStream.listen((snapshot) {
+      if (snapshot.exists) {
+        var data = snapshot.data()!;
+
+        setState(() {
+          _email.text = data['email'];
+          _username.text = data['username'];
+          _birthday.text = data['birthday'];
+          university = data['university'];
+          isAdmin = data['admin'];
+        });
       }
     });
   }
@@ -412,7 +419,7 @@ class _ProfileState extends State<Profile> {
 
                     StreamBuilder(
                       stream: userStream,
-                      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      builder: (context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return const Center(
                             child: Padding(
@@ -422,7 +429,7 @@ class _ProfileState extends State<Profile> {
                           );
                         }
 
-                        if (snapshot.data!.docs.isEmpty) {
+                        if (snapshot.data!.data()!.isEmpty) {
                           return const Center(
                             child: Padding(
                               padding: EdgeInsets.fromLTRB(0, 10, 0, 30),
@@ -430,13 +437,6 @@ class _ProfileState extends State<Profile> {
                             ),
                           );
                         }
-
-                        // update admin value realtime
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          setState(() {
-                            isAdmin = snapshot.data!.docs[0]['admin'];
-                          });
-                        });
 
                         return Column(
                           children: [

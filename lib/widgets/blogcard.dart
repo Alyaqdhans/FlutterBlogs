@@ -21,6 +21,8 @@ class _BlogCardState extends State<BlogCard> {
   bool? isAdmin;
   List? userBlogs;
 
+  int readMoreLimit = 100;
+
   Future userData() async {
     DocumentSnapshot<Map<String, dynamic>>? userDoc;
 
@@ -170,16 +172,16 @@ class _BlogCardState extends State<BlogCard> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: MarkdownBody(
-                        data: contents.length > 100 ? '${contents.substring(0, 100)}...' : contents,
+                        data: contents.length > readMoreLimit ? '${contents.substring(0, readMoreLimit)}...' : contents,
                         fitContent: false,
                       ),
                     ),
 
-                    if (contents.length > 100)
+                    if (contents.length > readMoreLimit)
                       const SizedBox(height: 8),
 
                     // Floating Action Button for Read More
-                    if (contents.length > 100)
+                    if (contents.length > readMoreLimit)
                       Center(
                         child: SizedBox(
                           height: 30,
