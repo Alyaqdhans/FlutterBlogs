@@ -56,7 +56,7 @@ class _BlogCardState extends State<BlogCard> {
       itemBuilder: (context, index) {
         var blogData = widget.snapshot.data!.docs[index];
 
-        var userId = blogData['userid'];
+        var userid = blogData['userid'];
         var username = blogData['username'];
         var id = blogData.id;
         var title = blogData['title'];
@@ -266,7 +266,7 @@ class _BlogCardState extends State<BlogCard> {
                                 ),
                                 
                                 // Extra options
-                                (isAdmin == null && (user != null && username != user!.displayName))
+                                (isAdmin == null && (user != null && userid != user!.uid))
                                 ? const Align(
                                     alignment: Alignment.centerRight,
                                     child: Padding(
@@ -278,7 +278,7 @@ class _BlogCardState extends State<BlogCard> {
                                         ),
                                       ),
                                 )
-                                : (user == null || !(user!.uid == userId || isAdmin == true))
+                                : (user == null || !(user!.uid == userid || isAdmin == true))
                                   ? const SizedBox.shrink()
                                   : Align(
                                       alignment: Alignment.centerRight,
