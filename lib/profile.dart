@@ -64,6 +64,7 @@ class _ProfileState extends State<Profile> {
       });
 
       msg.success(context, Icons.check, 'Logged in successfully!', Colors.green);
+      getUserData();
 
     } catch(error) {
       msg.failed(context, Icons.close, error, Colors.red);
@@ -159,14 +160,9 @@ class _ProfileState extends State<Profile> {
   }
 
   // moved stream outside builder so it only run once
-  late final Stream<DocumentSnapshot<Map<String, dynamic>>> userStream;
+  Stream<DocumentSnapshot<Map<String, dynamic>>>? userStream;
 
-  @override
-  void initState() {
-    super.initState();
-
-    universities = ddd.getUniversities();
-
+  Future getUserData() async {
     if (!mounted) return; // if page is closed
     if (user == null) return;
 
@@ -174,7 +170,7 @@ class _ProfileState extends State<Profile> {
     userStream = FirebaseFirestore.instance.collection('users').doc(user!.uid).snapshots();
     
     // listen to user data from stream and update them
-    userStream.listen((snapshot) {
+    userStream!.listen((snapshot) {
       if (snapshot.exists) {
         var data = snapshot.data()!;
 
@@ -187,6 +183,14 @@ class _ProfileState extends State<Profile> {
         });
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    universities = ddd.getUniversities();
+    getUserData();
   }
 
   @override
