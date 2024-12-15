@@ -140,18 +140,22 @@ class _BlogCardState extends State<BlogCard> {
                                     onPressed: (user == null)
                                     ? null
                                     : () async {
-                                      if (isFavorite == false) {
-                                        isFavorite = true;
-                                        favorites++;
-                                        userBlogs!.add(id);
-                                      } else {
-                                        isFavorite = false;
-                                        favorites--;
-                                        userBlogs!.remove(id);
+                                      try {
+                                        if (isFavorite == false) {
+                                          isFavorite = true;
+                                          favorites++;
+                                          userBlogs!.add(id);
+                                        } else {
+                                          isFavorite = false;
+                                          favorites--;
+                                          userBlogs!.remove(id);
+                                        }
+                        
+                                        await FirebaseFirestore.instance.collection('blogs').doc(id).update({'favorites': favorites});
+                                        await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({'blogs': userBlogs});
+                                      } catch(error) {
+                                        msg.failed(context, Icons.close, error, Colors.red);
                                       }
-                      
-                                      await FirebaseFirestore.instance.collection('blogs').doc(id).update({'favorites': favorites});
-                                      await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({'blogs': userBlogs});
                                     },
                                     icon: (isFavorite == true)
                                     ? const Icon(Icons.star, color: Colors.redAccent)
