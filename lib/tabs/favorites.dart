@@ -15,6 +15,9 @@ class _FavoritesState extends State<Favorites> {
   List? userBlogs;
 
   Future userData() async {
+    if (!mounted) return; // if page is closed
+    if (user == null) return;
+
     DocumentSnapshot<Map<String, dynamic>>? userDoc;
 
     try {
@@ -36,7 +39,6 @@ class _FavoritesState extends State<Favorites> {
   void initState() {
     super.initState();
 
-    if (user == null) return;
     userData();
   }
 

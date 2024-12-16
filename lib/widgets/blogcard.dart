@@ -20,10 +20,14 @@ class _BlogCardState extends State<BlogCard> {
   User? user = FirebaseAuth.instance.currentUser;
   bool? isAdmin;
   List? userBlogs;
+  Map<String, bool> loadingStates = {};
 
   int readMoreLimit = 100;
 
   Future userData() async {
+    if (!mounted) return; // if page is closed
+    if (user == null) return;
+    
     DocumentSnapshot<Map<String, dynamic>>? userDoc;
 
     try {
@@ -46,7 +50,6 @@ class _BlogCardState extends State<BlogCard> {
   void initState() {
     super.initState();
 
-    if (user == null) return;
     userData();
   }
 
@@ -68,15 +71,6 @@ class _BlogCardState extends State<BlogCard> {
         var isEdited = blogData['isEdited'];
         var lastEdited = (blogData['lastEdited'] as Timestamp).toDate();
         var favorites = blogData['favorites'] as int;
-
-        bool? isFavorite;
-        if (userBlogs != null) {
-          if (userBlogs!.contains(id)) {
-            isFavorite = true;
-          } else {
-            isFavorite = false;
-          }
-        }
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -126,7 +120,7 @@ class _BlogCardState extends State<BlogCard> {
                                 ),
                             
                                 // Favorite
-                                (user != null && isFavorite == null)
+                                (user != null && userBlogs == null || loadingStates[id] == true)
                                 ? const Padding(
                                     padding: EdgeInsets.symmetric(horizontal: 10),
                                       child: SizedBox(
@@ -140,24 +134,28 @@ class _BlogCardState extends State<BlogCard> {
                                     onPressed: (user == null)
                                     ? null
                                     : () async {
-                                      try {
-                                        if (isFavorite == false) {
-                                          isFavorite = false;
-                                          favorites++;
-                                          userBlogs!.add(id);
-                                        } else {
-                                          isFavorite = true;
-                                          favorites--;
-                                          userBlogs!.remove(id);
-                                        }
-                        
-                                        await FirebaseFirestore.instance.collection('blogs').doc(id).update({'favorites': favorites});
-                                        await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({'blogs': userBlogs});
-                                      } catch(error) {
-                                        msg.failed(context, Icons.close, error, Colors.red);
+                                      setState(() {
+                                        loadingStates[id] = true;
+                                      });
+
+                                      if (userBlogs!.contains(id) == false) {
+                                        favorites++;
+                                        userBlogs!.add(id);
+                                      } else {
+                                        favorites--;
+                                        userBlogs!.remove(id);
                                       }
+
+                                      await FirebaseFirestore.instance.collection('blogs').doc(id).update({'favorites': favorites});
+                                      await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({'blogs': userBlogs});
+
+                                      Future.delayed(const Duration(milliseconds: 300));
+                                      
+                                      setState(() {
+                                        loadingStates[id] = false;
+                                      });
                                     },
-                                    icon: (isFavorite == true)
+                                    icon: (userBlogs?.contains(id) == true)
                                     ? const Icon(Icons.star, color: Colors.redAccent)
                                     : const Icon(Icons.star_border)
                                   ),
