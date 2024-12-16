@@ -41,6 +41,8 @@ class _CreateState extends State<Create> {
       || department!.isEmpty
       || _course.text.trim().isEmpty) throw 'Some fields are empty';
 
+      if (_course.text.trim().length < 8) throw 'Course ID must be 8 characters';
+
       await FirebaseFirestore.instance.collection('blogs').add({
         'userid': user!.uid,
         'username': user!.displayName,

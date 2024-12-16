@@ -312,6 +312,28 @@ class _BlogCardState extends State<BlogCard> {
                                           
                                                 if (result == true) {
                                                   await FirebaseFirestore.instance.collection('blogs').doc(id).delete();
+
+                                                  // Get all users that have this blog ID in their array
+                                                  QuerySnapshot<Map<String, dynamic>> usersWithBlog = await FirebaseFirestore.instance.collection('users')
+                                                    .where('blogs', arrayContains: id).get();
+
+                                                  // Create a batch instance
+                                                  WriteBatch batch = FirebaseFirestore.instance.batch();
+
+                                                  // Add updates to the batch
+                                                  for (var userDoc in usersWithBlog.docs) {
+                                                    DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(userDoc.id);
+                                                    
+                                                    // Get current blogs array and remove the blog ID
+                                                    List blogs = List.from(userDoc.data()['blogs']);
+                                                    blogs.remove(id);
+                                                    
+                                                    // Update the user document with the modified array
+                                                    batch.update(userRef, {'blogs': blogs});
+                                                  }
+
+                                                  await batch.commit();
+                                                  userBlogs!.remove(id);
                                                 }
                                               }
                                             },
