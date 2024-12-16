@@ -181,7 +181,7 @@ class _ProfileState extends State<Profile> {
     
     // listen to user data from stream and update them
     userStream!.listen((snapshot) {
-      if (snapshot.exists) {
+      if (snapshot.exists && mounted) {
         var data = snapshot.data()!;
 
         setState(() {
