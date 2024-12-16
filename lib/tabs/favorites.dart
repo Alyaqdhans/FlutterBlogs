@@ -12,7 +12,7 @@ class Favorites extends StatefulWidget {
 
 class _FavoritesState extends State<Favorites> {
   User? user = FirebaseAuth.instance.currentUser;
-  List? userBlogs;
+  List userBlogs = [];
 
   Future userData() async {
     if (!mounted) return; // if page is closed
@@ -65,6 +65,33 @@ class _FavoritesState extends State<Favorites> {
               textAlign: TextAlign.center,
             ),
           ],
+        ),
+      );
+    }
+
+    if (userBlogs.isEmpty) {
+      return Container(
+        color: Colors.grey[200],
+        child: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.heart_broken_outlined,
+                color: Colors.blue,
+                size: 70,
+              ),
+              
+              Text(
+                "You didn't favorite anything yet",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       );
     }

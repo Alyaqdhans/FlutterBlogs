@@ -87,13 +87,13 @@ class _MyblogsState extends State<Myblogs> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.search_off,
+                    Icons.library_books_outlined,
                     color: Colors.blue,
                     size: 70,
                   ),
                   
                   Text(
-                    'No data were found',
+                    "You didn't create any blogs yet",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 30,

@@ -5,6 +5,7 @@ import 'package:blogs/widgets/preview.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Create extends StatefulWidget {
   const Create({super.key});
@@ -45,7 +46,7 @@ class _CreateState extends State<Create> {
         'username': user!.displayName,
         'title': _title.text.trim(),
         'contents': _content.text.trim(),
-        'tags': [university, department, _course.text.trim().toLowerCase()],
+        'tags': [university, department, _course.text.trim()],
         'date': DateTime.now(),
         'isEdited': false,
         'lastEdited': DateTime.now(),
@@ -223,10 +224,33 @@ class _CreateState extends State<Create> {
               
                     ListTile(
                       title: TextFormField(
+                        maxLength: 8,
                         controller: _course,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
+                          TextInputFormatter.withFunction((oldValue, newValue) {
+                            if (newValue.text.length <= 4) {
+                              String letters = newValue.text.replaceAll(RegExp(r'[^A-Za-z]'), '');
+                              return TextEditingValue(
+                                text: letters.toUpperCase(),
+                                selection: TextSelection.collapsed(offset: letters.length),
+                              );
+                            } else {
+                              String letters = newValue.text.substring(0, 4).toUpperCase();
+                              String numbers = newValue.text.substring(4).replaceAll(RegExp(r'[^0-9]'), '');
+                              String finalText = letters + numbers;
+                              
+                              return TextEditingValue(
+                                text: finalText,
+                                selection: TextSelection.collapsed(offset: finalText.length),
+                              );
+                            }
+                          }),
+                        ],
                         decoration: InputDecoration(
                           labelText: 'Course ID',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15))
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                          helperText: 'Format: XXXX0000 (4 letters, 4 numbers)',
                         ),
                       ),
                     ),
