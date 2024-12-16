@@ -38,7 +38,7 @@ class _BlogCardState extends State<BlogCard> {
       userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.server));
     }
     
-    if (userDoc.data()!.isNotEmpty) {
+    if (userDoc.data()!.isNotEmpty && mounted) {
       setState(() {
         isAdmin = userDoc!.data()!['admin'];
         userBlogs = userDoc.data()!['blogs'];
@@ -138,18 +138,37 @@ class _BlogCardState extends State<BlogCard> {
                                         loadingStates[id] = true;
                                       });
 
-                                      if (userBlogs!.contains(id) == false) {
-                                        favorites++;
-                                        userBlogs!.add(id);
-                                      } else {
-                                        favorites--;
-                                        userBlogs!.remove(id);
-                                      }
+                                      await FirebaseFirestore.instance.runTransaction((transaction) async {
+                                        // References
+                                        DocumentReference blogRef = FirebaseFirestore.instance.collection('blogs').doc(id);
+                                        DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(user!.uid);
 
-                                      await FirebaseFirestore.instance.collection('blogs').doc(id).update({'favorites': favorites});
-                                      await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({'blogs': userBlogs});
+                                        // Get the latest blog document
+                                        DocumentSnapshot blogSnapshot = await transaction.get(blogRef);
+                                        DocumentSnapshot userSnapshot = await transaction.get(userRef);
 
-                                      Future.delayed(const Duration(milliseconds: 300));
+                                        // Get the current favorites count
+                                        int currentFavorites = blogSnapshot['favorites'];
+
+                                        // Use the database state, not the local variable
+                                        List<dynamic> currentUserBlogs = userSnapshot['blogs'];
+                                        bool dbIsFavorite = currentUserBlogs.contains(id);
+
+                                        if (dbIsFavorite == false) {
+                                          // Increment favorites
+                                          transaction.update(blogRef, {'favorites': currentFavorites + 1});
+                                          currentUserBlogs.add(id);
+                                          userBlogs!.add(id);
+                                        } else {
+                                          // Decrement favorites
+                                          transaction.update(blogRef, {'favorites': currentFavorites - 1});
+                                          currentUserBlogs.remove(id);
+                                          userBlogs!.remove(id);
+                                        }
+
+                                        // Update user's blogs list
+                                        transaction.update(userRef, {'blogs': currentUserBlogs});
+                                      });
                                       
                                       setState(() {
                                         loadingStates[id] = false;
