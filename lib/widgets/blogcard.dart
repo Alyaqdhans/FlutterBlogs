@@ -141,18 +141,28 @@ class _BlogCardState extends State<BlogCard> {
                                     ? null
                                     : () async {
                                       try {
-                                        if (isFavorite == false) {
-                                          isFavorite = true;
-                                          favorites++;
-                                          userBlogs!.add(id);
-                                        } else {
-                                          isFavorite = false;
+                                        setState(() {
+                                          isFavorite = null;
+                                        });
+
+                                        if (userBlogs!.contains(id)) {
                                           favorites--;
                                           userBlogs!.remove(id);
+                                        } else {
+                                          favorites++;
+                                          userBlogs!.add(id);
                                         }
                         
                                         await FirebaseFirestore.instance.collection('blogs').doc(id).update({'favorites': favorites});
                                         await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({'blogs': userBlogs});
+
+                                        Future.delayed(const Duration(milliseconds: 200));
+
+                                        if (userBlogs!.contains(id)) {
+                                          isFavorite = true;
+                                        } else {
+                                          isFavorite = false;
+                                        }
                                       } catch(error) {
                                         msg.failed(context, Icons.close, error, Colors.red);
                                       }
