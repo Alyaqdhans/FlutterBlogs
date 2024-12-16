@@ -116,14 +116,24 @@ class _ProfileState extends State<Profile> {
   }
 
   Future reset() async {
+    setState(() {
+      isResetting = true;
+    });
+
     try {
+      await Future.delayed(const Duration(seconds: 1));
+      msg.success(context, Icons.info_outline, 'You might need to wait up to 2 minutes', Colors.blue[700]);
+
+      await Future.delayed(const Duration(seconds: 5));
       await FirebaseAuth.instance.sendPasswordResetEmail(
         email: _email.text.trim()
       );
-
-      msg.success(context, Icons.info_outline, 'You might need to wait up to 2 minutes', Colors.blue[700]);
     } catch(error) {
       msg.failed(context, Icons.close, error, Colors.red);
+    } finally {
+      setState(() {
+        isResetting = false;
+      });
     }
   }
 
@@ -561,33 +571,44 @@ class _ProfileState extends State<Profile> {
                             flex: 3,
                             child: SizedBox(
                               height: 45,
-                              child: FloatingActionButton.extended(
-                                foregroundColor: Colors.orange[800],
-                                backgroundColor: Colors.orange[100],
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                  side: const BorderSide(color: Colors.orange, width: 2)
-                                ),
-                                // icon: const Icon(Icons.key, color: Colors.orange),
-                                label: const Text(
-                                    'Reset Password',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16.5
-                                    ),
+                              child: (isResetting == false)
+                              ? FloatingActionButton.extended(
+                                  foregroundColor: Colors.orange[800],
+                                  backgroundColor: Colors.orange[100],
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                    side: const BorderSide(color: Colors.orange, width: 2)
                                   ),
-                                onPressed: () async {
-                                  final result = await msg.showBottomAction(
-                                    context,
-                                    'Are you sure you want to reset?',
-                                    'You will receive an email on the registered account.',
-                                    'Reset Password',
-                                    Colors.orange[600]
-                                  );
+                                  // icon: const Icon(Icons.key, color: Colors.orange),
+                                  label: const Text(
+                                      'Reset Password',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.5
+                                      ),
+                                    ),
+                                  onPressed: () async {
+                                    final result = await msg.showBottomAction(
+                                      context,
+                                      'Are you sure you want to reset?',
+                                      'You will receive an email on the registered account.',
+                                      'Reset Password',
+                                      Colors.orange[600]
+                                    );
 
-                                  if (result == true) reset();
-                                },
-                              ),
+                                    if (result == true) reset();
+                                  },
+                                )
+                              : FloatingActionButton.extended(
+                                  backgroundColor: Colors.grey[500],
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                  label: const SizedBox(
+                                    width: 25,
+                                    height: 25,
+                                    child: CircularProgressIndicator(color: Colors.white)
+                                  ),
+                                  onPressed: null,
+                                ),
                             ),
                           ),
                       
