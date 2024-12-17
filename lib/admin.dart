@@ -1,3 +1,6 @@
+import 'package:blogs/widgets/errors/haserror.dart';
+import 'package:blogs/widgets/errors/isempty.dart';
+import 'package:blogs/widgets/errors/spinner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -27,63 +30,15 @@ class _AdminState extends State<Admin> {
         stream: FirebaseFirestore.instance.collection('users').orderBy('date').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: SizedBox(
-                width: 100,
-                height: 100,
-                child: CircularProgressIndicator(color: Colors.white),
-              ),
-            );
+            return const Spinner(color: Colors.white);
           }
 
           if (snapshot.hasError) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.warning,
-                    color: Colors.yellow,
-                    size: 60,
-                  ),
-                  
-                  Text(
-                    'Something went wrong :(',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                      color: Colors.white
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
+            return const Haserror();
           }
     
           if (snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.search_off,
-                    color: Colors.yellow,
-                    size: 60,
-                  ),
-                  
-                  Text(
-                    'No data were found',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                      color: Colors.white
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
+            return const Isempty();
           }
     
           return ListView.builder(

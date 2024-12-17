@@ -1,4 +1,8 @@
 import 'package:blogs/widgets/blogcard.dart';
+import 'package:blogs/widgets/errors/haserror.dart';
+import 'package:blogs/widgets/errors/isempty.dart';
+import 'package:blogs/widgets/errors/loggedonly.dart';
+import 'package:blogs/widgets/errors/spinner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,19 +22,13 @@ class _FavoritesState extends State<Favorites> {
     if (!mounted) return; // if page is closed
     if (user == null) return;
 
-    DocumentSnapshot<Map<String, dynamic>>? userDoc;
+    QuerySnapshot<Map<String, dynamic>>? userDoc;
 
-    try {
-      // trying to get it from cache first
-      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.cache));
-    } catch(error) {
-      // get from server if cache fails
-      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.server));
-    }
+    userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).collection('blogs').get();
     
-    if (userDoc.data()!.isNotEmpty) {
+    if (mounted) {
       setState(() {
-        userBlogs = userDoc!.data()!['blogs'];
+        userBlogs = userDoc!.docs.map((doc) => doc.id).toList();
       });
     }
   }
@@ -46,51 +44,34 @@ class _FavoritesState extends State<Favorites> {
   Widget build(BuildContext context) {
     // check if user is logged in
     if (user == null) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.lock,
-              color: Colors.blue,
-              size: 60,
-            ),
-            
-            Text(
-              'For logged in users only',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 30,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      );
+      return const Loggedonly();
     }
 
     if (userBlogs.isEmpty) {
       return Container(
         color: Colors.grey[200],
         child: const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.heart_broken_outlined,
-                color: Colors.blue,
-                size: 70,
-              ),
-              
-              Text(
-                "You didn't favorite anything yet",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30,
+          child: Padding(
+            padding: EdgeInsets.all(30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.heart_broken_outlined,
+                  color: Colors.blue,
+                  size: 70,
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+                
+                Text(
+                  "You didn't favorite anything yet",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -100,65 +81,19 @@ class _FavoritesState extends State<Favorites> {
       backgroundColor: Colors.grey[200],
 
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('blogs').orderBy('date', descending: true)
+        stream: FirebaseFirestore.instance.collection('blogs')
         .where(FieldPath.documentId, whereIn: userBlogs).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: SizedBox(
-                width: 100,
-                height: 100,
-                child: CircularProgressIndicator(),
-              ),
-            );
+            return const Spinner();
           }
 
           if (snapshot.hasError) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.warning,
-                    color: Colors.blue,
-                    size: 60,
-                  ),
-                  
-                  Text(
-                    'Something went wrong :(',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
+            return const Haserror();
           }
 
           if (snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.search_off,
-                    color: Colors.blue,
-                    size: 70,
-                  ),
-                  
-                  Text(
-                    'No data were found',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
+            return const Isempty();
           }
 
           return BlogCard(snapshot: snapshot);

@@ -5,6 +5,7 @@ import 'package:blogs/widgets/preview.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Edit extends StatefulWidget {
   final QueryDocumentSnapshot<Map<String, dynamic>> blogData;
@@ -26,6 +27,9 @@ class _EditState extends State<Edit> {
   String? department;
   List? departments;
   final TextEditingController _course = TextEditingController();
+
+  String? universityBlog;
+  String? departmentBlog;
   
   bool isLoading = false;
 
@@ -44,7 +48,7 @@ class _EditState extends State<Edit> {
       await FirebaseFirestore.instance.collection('blogs').doc(id).update({
         'title': _title.text.trim(),
         'contents': _content.text.trim(),
-        'tags': [university, department, _course.text.trim().toLowerCase()],
+        'tags': [university, department, _course.text.trim()],
         'isEdited': true,
         'lastEdited': DateTime.now(),
       });
@@ -66,6 +70,14 @@ class _EditState extends State<Edit> {
     super.initState();
     universities = ddd.getUniversities();
     departments = ddd.getDepartments();
+
+    _content.text = widget.blogData['contents'].toString();
+    universityBlog = widget.blogData['tags'][0];
+    departmentBlog = widget.blogData['tags'][1];
+    _course.text = widget.blogData['tags'][2];
+
+    university = universityBlog;
+    department = departmentBlog;
   }
 
   @override
@@ -79,11 +91,6 @@ class _EditState extends State<Edit> {
   Widget build(BuildContext context) {
     var id = widget.blogData.id;
     var title = widget.blogData['title'];
-    var contents = widget.blogData['contents'].toString();
-    var [universityBlog, departmentBlog, courseBlog] = (widget.blogData['tags'] as List).toList();
-
-    university = universityBlog;
-    department = departmentBlog;
     
     return Scaffold(
       backgroundColor: Colors.grey[200],
@@ -129,7 +136,7 @@ class _EditState extends State<Edit> {
                     TextFormField(
                       maxLength: 2000,
                       maxLines: 10,
-                      controller: _content..text = contents,
+                      controller: _content,
                       decoration: InputDecoration(
                         alignLabelWithHint: true,
                         labelText: 'Blog Contents',
@@ -230,7 +237,39 @@ class _EditState extends State<Edit> {
               
                     ListTile(
                       title: TextFormField(
-                        controller: _course..text = courseBlog.toString(),
+                        controller: _course,
+                        textCapitalization: TextCapitalization.characters,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
+                          TextInputFormatter.withFunction((oldValue, newValue) {
+                            String text = newValue.text.toUpperCase();
+                            String letters = text.replaceAll(RegExp(r'[^A-Z]'), '');
+                            String numbers = text.replaceAll(RegExp(r'[^0-9]'), '');
+
+                            // Ensure only the first 4 characters are letters
+                            if (letters.length > 4) {
+                              letters = letters.substring(0, 4);
+                            }
+
+                            // Ensure only the last 4 characters are numbers
+                            if (numbers.length > 4) {
+                              numbers = numbers.substring(0, 4);
+                            }
+
+                            // Combine letters and numbers
+                            String finalText = letters + numbers;
+
+                            // Limit the final text to 8 characters
+                            if (finalText.length > 8) {
+                              finalText = finalText.substring(0, 8);
+                            }
+
+                            return TextEditingValue(
+                              text: finalText,
+                              selection: TextSelection.collapsed(offset: finalText.length),
+                            );
+                          }),
+                        ],
                         decoration: InputDecoration(
                           labelText: 'Course ID',
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(15))

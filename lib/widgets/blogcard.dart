@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:blogs/edit.dart';
 import 'package:blogs/function/messenger.dart';
 import 'package:blogs/widgets/preview.dart';
@@ -19,8 +21,10 @@ class _BlogCardState extends State<BlogCard> {
   Messenger msg = Messenger();
   User? user = FirebaseAuth.instance.currentUser;
   bool? isAdmin;
-  List? userBlogs;
   Map<String, bool> loadingStates = {};
+  Map<String, int> favoriteCounts = {};
+  Map<String, bool> userFavorites = {};
+  Map<String, StreamSubscription> favoriteStreams = {};
 
   int readMoreLimit = 100;
 
@@ -30,18 +34,11 @@ class _BlogCardState extends State<BlogCard> {
     
     DocumentSnapshot<Map<String, dynamic>>? userDoc;
 
-    try {
-      // trying to get it from cache first
-      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.cache));
-    } catch(error) {
-      // get from server if cache fails
-      userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get(const GetOptions(source: Source.server));
-    }
+    userDoc = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
     
     if (userDoc.data()!.isNotEmpty && mounted) {
       setState(() {
         isAdmin = userDoc!.data()!['admin'];
-        userBlogs = userDoc.data()!['blogs'];
       });
     }
   }
@@ -51,6 +48,32 @@ class _BlogCardState extends State<BlogCard> {
     super.initState();
 
     userData();
+  }
+
+  @override
+  void dispose() {
+    // Cancel all streams when widget is disposed
+    for (var stream in favoriteStreams.values) {
+      stream.cancel();
+    }
+    super.dispose();
+  }
+
+  // Add this method to setup stream for each blog
+  void listenToFavorites(String blogId) {
+    if (favoriteStreams.containsKey(blogId)) return;
+
+    final stream = FirebaseFirestore.instance.collection('blogs')
+      .doc(blogId).collection('favorites').snapshots();
+
+    favoriteStreams[blogId] = stream.listen((snapshot) {
+      if (mounted) {
+        setState(() {
+          favoriteCounts[blogId] = snapshot.docs.length;
+          userFavorites[blogId] = snapshot.docs.any((doc) => doc.id == user?.uid);
+        });
+      }
+    });
   }
 
   @override
@@ -70,7 +93,9 @@ class _BlogCardState extends State<BlogCard> {
         var date = (blogData['date'] as Timestamp).toDate();
         var isEdited = blogData['isEdited'];
         var lastEdited = (blogData['lastEdited'] as Timestamp).toDate();
-        var favorites = blogData['favorites'] as int;
+
+        // Setup stream for this blog
+        listenToFavorites(id);
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -111,73 +136,71 @@ class _BlogCardState extends State<BlogCard> {
                             padding: const EdgeInsets.only(left: 10),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                Text(
-                                  favorites.toString(),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold
-                                  )
-                                ),
-                            
                                 // Favorite
-                                (user != null && userBlogs == null || loadingStates[id] == true)
+                                (favoriteCounts[id] == null || userFavorites[id] == null || loadingStates[id] == true)
                                 ? const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 10),
+                                    padding: EdgeInsets.symmetric(horizontal: 15),
                                       child: SizedBox(
                                         height: 20,
                                         width: 20,
                                         child: CircularProgressIndicator()
                                       ),
                                     )
-                                : IconButton(
-                                    tooltip: 'Favorite',
-                                    onPressed: (user == null)
-                                    ? null
-                                    : () async {
-                                      setState(() {
-                                        loadingStates[id] = true;
-                                      });
+                                : Row(
+                                  children: [
+                                    Text(
+                                      (favoriteCounts[id]).toString(),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold
+                                      )
+                                    ),
 
-                                      await FirebaseFirestore.instance.runTransaction((transaction) async {
-                                        // References
-                                        DocumentReference blogRef = FirebaseFirestore.instance.collection('blogs').doc(id);
-                                        DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(user!.uid);
-
-                                        // Get the latest blog document
-                                        DocumentSnapshot blogSnapshot = await transaction.get(blogRef);
-                                        DocumentSnapshot userSnapshot = await transaction.get(userRef);
-
-                                        // Get the current favorites count
-                                        int currentFavorites = blogSnapshot['favorites'];
-
-                                        // Use the database state, not the local variable
-                                        List<dynamic> currentUserBlogs = userSnapshot['blogs'];
-                                        bool dbIsFavorite = currentUserBlogs.contains(id);
-
-                                        if (dbIsFavorite == false) {
-                                          // Increment favorites
-                                          transaction.update(blogRef, {'favorites': currentFavorites + 1});
-                                          currentUserBlogs.add(id);
-                                        } else {
-                                          // Decrement favorites
-                                          transaction.update(blogRef, {'favorites': currentFavorites - 1});
-                                          currentUserBlogs.remove(id);
-                                        }
-                                        // Update local blog list
-                                        userBlogs = currentUserBlogs;
-
-                                        // Update user's blogs list
-                                        transaction.update(userRef, {'blogs': currentUserBlogs});
-                                      });
-                                      
-                                      setState(() {
-                                        loadingStates[id] = false;
-                                      });
-                                    },
-                                    icon: (userBlogs?.contains(id) == true)
-                                    ? const Icon(Icons.star, color: Colors.redAccent)
-                                    : const Icon(Icons.star_border)
-                                  ),
+                                    IconButton(
+                                        tooltip: 'Favorite',
+                                        onPressed: (user == null)
+                                        ? null
+                                        : () async {
+                                          setState(() {
+                                            loadingStates[id] = true;
+                                          });
+                                    
+                                          try {
+                                            DocumentReference userBlogRef = FirebaseFirestore.instance.collection('users')
+                                              .doc(user!.uid).collection('blogs').doc(id);
+                                            DocumentReference blogFavoriteRef = FirebaseFirestore.instance.collection('blogs')
+                                              .doc(id).collection('favorites').doc(user!.uid);
+                                    
+                                            DocumentSnapshot userBlogDoc = await userBlogRef.get();
+                                    
+                                            if (!userBlogDoc.exists) {
+                                              // Add to favorites
+                                              await userBlogRef.set({
+                                                'timestamp': DateTime.now(),
+                                              });
+                                              await blogFavoriteRef.set({
+                                                'timestamp': DateTime.now(),
+                                              });
+                                            } else {
+                                              // Remove from favorites
+                                              await userBlogRef.delete();
+                                              await blogFavoriteRef.delete();
+                                            }
+                                          } catch (error) {
+                                            msg.failed(context, Icons.close, error, Colors.red);
+                                          }
+                                    
+                                          setState(() {
+                                            loadingStates[id] = false;
+                                          });
+                                        },
+                                        icon: userFavorites[id] == true
+                                        ? const Icon(Icons.star, color: Colors.redAccent)
+                                        : const Icon(Icons.star_border)
+                                      ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
@@ -254,7 +277,7 @@ class _BlogCardState extends State<BlogCard> {
                     const SizedBox(height: 5),
 
                     SizedBox(
-                      height: 40,
+                      height: 50,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -267,7 +290,7 @@ class _BlogCardState extends State<BlogCard> {
                                 Align(
                                   alignment: Alignment.centerLeft,
                                   child: SingleChildScrollView(
-                                    padding: const EdgeInsets.only(right: 50),
+                                    padding: const EdgeInsets.only(left: 5, right: 60),
                                     scrollDirection: Axis.horizontal,
                                     child: Wrap(
                                       spacing: 8,
@@ -330,29 +353,31 @@ class _BlogCardState extends State<BlogCard> {
                                                 );
                                           
                                                 if (result == true) {
+                                                  // Delete the blog document
                                                   await FirebaseFirestore.instance.collection('blogs').doc(id).delete();
 
-                                                  // Get all users that have this blog ID in their array
-                                                  QuerySnapshot<Map<String, dynamic>> usersWithBlog = await FirebaseFirestore.instance.collection('users')
-                                                    .where('blogs', arrayContains: id).get();
+                                                  // Get all users that have this blog ID in their subcollection
+                                                  QuerySnapshot<Map<String, dynamic>> usersWithBlog = await FirebaseFirestore.instance.collection('users').get();
 
                                                   // Create a batch instance
                                                   WriteBatch batch = FirebaseFirestore.instance.batch();
 
-                                                  // Add updates to the batch
+                                                  // Iterate over each user document
                                                   for (var userDoc in usersWithBlog.docs) {
-                                                    DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(userDoc.id);
-                                                    
-                                                    // Get current blogs array and remove the blog ID
-                                                    List blogs = List.from(userDoc.data()['blogs']);
-                                                    blogs.remove(id);
-                                                    
-                                                    // Update the user document with the modified array
-                                                    batch.update(userRef, {'blogs': blogs});
+                                                    // Reference to the user's blog subcollection document
+                                                    DocumentReference userBlogRef = FirebaseFirestore.instance.collection('users')
+                                                      .doc(userDoc.id).collection('blogs').doc(id);
+
+                                                    // Check if the document exists in the subcollection
+                                                    DocumentSnapshot userBlogSnapshot = await userBlogRef.get();
+                                                    if (userBlogSnapshot.exists) {
+                                                      // Add delete operation to the batch
+                                                      batch.delete(userBlogRef);
+                                                    }
                                                   }
 
+                                                  // Commit the batch
                                                   await batch.commit();
-                                                  userBlogs!.remove(id);
                                                 }
                                               }
                                             },

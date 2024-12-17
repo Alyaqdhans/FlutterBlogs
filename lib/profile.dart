@@ -490,7 +490,7 @@ class _ProfileState extends State<Profile> {
                                 onTap: () async {
                                   DateTime? selected = await showDatePicker(
                                     context: context,
-                                    initialDate: DateFormat('d/M/y').parse(_birthday.text.toString()),
+                                    initialDate: (_birthday.text.isNotEmpty) ? DateFormat('d/M/y').parse(_birthday.text.toString()) : null,
                                     firstDate: DateTime.utc(1900),
                                     lastDate: DateTime.now()
                                   );

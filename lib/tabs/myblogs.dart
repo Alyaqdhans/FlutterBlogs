@@ -1,4 +1,8 @@
 import 'package:blogs/widgets/blogcard.dart';
+import 'package:blogs/widgets/errors/haserror.dart';
+import 'package:blogs/widgets/errors/isempty.dart';
+import 'package:blogs/widgets/errors/loggedonly.dart';
+import 'package:blogs/widgets/errors/spinner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,27 +21,7 @@ class _MyblogsState extends State<Myblogs> {
   Widget build(BuildContext context) {
     // check if user is logged in
     if (user == null) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.lock,
-              color: Colors.blue,
-              size: 60,
-            ),
-            
-            Text(
-              'For logged in users only',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 30,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      );
+      return const Loggedonly();
     }
 
     return Scaffold(
@@ -48,61 +32,15 @@ class _MyblogsState extends State<Myblogs> {
         .where('userid', isEqualTo: user!.uid).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: SizedBox(
-                width: 100,
-                height: 100,
-                child: CircularProgressIndicator(),
-              ),
-            );
+            return const Spinner();
           }
 
           if (snapshot.hasError) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.warning,
-                    color: Colors.blue,
-                    size: 60,
-                  ),
-                  
-                  Text(
-                    'Something went wrong :(',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
+            return const Haserror();
           }
 
           if (snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.library_books_outlined,
-                    color: Colors.blue,
-                    size: 70,
-                  ),
-                  
-                  Text(
-                    "You didn't create any blogs yet",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
+            return const Isempty();
           }
 
           return BlogCard(snapshot: snapshot);

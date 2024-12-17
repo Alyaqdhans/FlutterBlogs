@@ -228,31 +228,42 @@ class _CreateState extends State<Create> {
                       title: TextFormField(
                         maxLength: 8,
                         controller: _course,
+                        textCapitalization: TextCapitalization.characters,
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
                           TextInputFormatter.withFunction((oldValue, newValue) {
-                            if (newValue.text.length <= 4) {
-                              String letters = newValue.text.replaceAll(RegExp(r'[^A-Za-z]'), '');
-                              return TextEditingValue(
-                                text: letters.toUpperCase(),
-                                selection: TextSelection.collapsed(offset: letters.length),
-                              );
-                            } else {
-                              String letters = newValue.text.substring(0, 4).toUpperCase();
-                              String numbers = newValue.text.substring(4).replaceAll(RegExp(r'[^0-9]'), '');
-                              String finalText = letters + numbers;
-                              
-                              return TextEditingValue(
-                                text: finalText,
-                                selection: TextSelection.collapsed(offset: finalText.length),
-                              );
+                            String text = newValue.text.toUpperCase();
+                            String letters = text.replaceAll(RegExp(r'[^A-Z]'), '');
+                            String numbers = text.replaceAll(RegExp(r'[^0-9]'), '');
+
+                            // Ensure only the first 4 characters are letters
+                            if (letters.length > 4) {
+                              letters = letters.substring(0, 4);
                             }
+
+                            // Ensure only the last 4 characters are numbers
+                            if (numbers.length > 4) {
+                              numbers = numbers.substring(0, 4);
+                            }
+
+                            // Combine letters and numbers
+                            String finalText = letters + numbers;
+
+                            // Limit the final text to 8 characters
+                            if (finalText.length > 8) {
+                              finalText = finalText.substring(0, 8);
+                            }
+
+                            return TextEditingValue(
+                              text: finalText,
+                              selection: TextSelection.collapsed(offset: finalText.length),
+                            );
                           }),
                         ],
                         decoration: InputDecoration(
                           labelText: 'Course ID',
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-                          helperText: 'Format: XXXX0000 (4 letters, 4 numbers)',
+                          helperText: 'XXXX0000 (must be 8 characters)',
                         ),
                       ),
                     ),
