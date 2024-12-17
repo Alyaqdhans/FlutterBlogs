@@ -52,7 +52,6 @@ class _CreateState extends State<Create> {
         'date': DateTime.now(),
         'isEdited': false,
         'lastEdited': DateTime.now(),
-        'favorites': 0
       });
 
       msg.success(context, Icons.check, 'Blog created successfully!', Colors.green);

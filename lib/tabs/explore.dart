@@ -25,7 +25,7 @@ class _ExploreState extends State<Explore> {
         stream: FirebaseFirestore.instance.collection('blogs').orderBy('date', descending: true).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Spinner();
+            return Spinner();
           }
           
           if (snapshot.hasError) {

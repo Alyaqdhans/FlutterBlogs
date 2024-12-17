@@ -16,7 +16,7 @@ class Favorites extends StatefulWidget {
 
 class _FavoritesState extends State<Favorites> {
   User? user = FirebaseAuth.instance.currentUser;
-  List userBlogs = [];
+  List? userBlogs;
 
   Future userData() async {
     if (!mounted) return; // if page is closed
@@ -47,7 +47,11 @@ class _FavoritesState extends State<Favorites> {
       return const Loggedonly();
     }
 
-    if (userBlogs.isEmpty) {
+    if (userBlogs == null) {
+      return Spinner();
+    }
+
+    if (userBlogs!.isEmpty) {
       return Container(
         color: Colors.grey[200],
         child: const Center(
@@ -81,11 +85,11 @@ class _FavoritesState extends State<Favorites> {
       backgroundColor: Colors.grey[200],
 
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('blogs')
+        stream: FirebaseFirestore.instance.collection('blogs').orderBy('date', descending: true)
         .where(FieldPath.documentId, whereIn: userBlogs).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Spinner();
+            return Spinner();
           }
 
           if (snapshot.hasError) {

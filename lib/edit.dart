@@ -272,7 +272,8 @@ class _EditState extends State<Edit> {
                         ],
                         decoration: InputDecoration(
                           labelText: 'Course ID',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15))
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                          helperText: 'XXXX0000 (must be 8 characters)',
                         ),
                       ),
                     ),

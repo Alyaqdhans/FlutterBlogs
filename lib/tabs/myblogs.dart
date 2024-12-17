@@ -32,7 +32,7 @@ class _MyblogsState extends State<Myblogs> {
         .where('userid', isEqualTo: user!.uid).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Spinner();
+            return Spinner();
           }
 
           if (snapshot.hasError) {

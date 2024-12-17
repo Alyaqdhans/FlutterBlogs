@@ -30,6 +30,8 @@ __This will also be bold__
 
 _You **can** combine them_
 
+~~This text is strike through~~
+
 ## Lists
 ---
 ### Unordered
@@ -93,7 +95,6 @@ This web site is using `markedjs/marked`.
 ```
 
 ###### **end of guide**
-<div style="text-align: right"> your-text-here </div>
 """;
 
   @override

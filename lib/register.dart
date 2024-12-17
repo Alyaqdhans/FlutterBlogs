@@ -59,7 +59,6 @@ class _RegisterState extends State<Register> {
         'date': DateTime.now(),
         'active': true,
         'admin': false,
-        'blogs': [],
       });
 
       msg.success(context, Icons.check, 'Registred successfully!', Colors.green);

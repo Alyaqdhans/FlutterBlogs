@@ -30,7 +30,7 @@ class _AdminState extends State<Admin> {
         stream: FirebaseFirestore.instance.collection('users').orderBy('date').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Spinner(color: Colors.white);
+            return Spinner(color: Colors.white, back: Colors.transparent);
           }
 
           if (snapshot.hasError) {
