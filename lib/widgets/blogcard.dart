@@ -158,13 +158,13 @@ class _BlogCardState extends State<BlogCard> {
                                           // Increment favorites
                                           transaction.update(blogRef, {'favorites': currentFavorites + 1});
                                           currentUserBlogs.add(id);
-                                          userBlogs!.add(id);
                                         } else {
                                           // Decrement favorites
                                           transaction.update(blogRef, {'favorites': currentFavorites - 1});
                                           currentUserBlogs.remove(id);
-                                          userBlogs!.remove(id);
                                         }
+                                        // Update local blog list
+                                        userBlogs = currentUserBlogs;
 
                                         // Update user's blogs list
                                         transaction.update(userRef, {'blogs': currentUserBlogs});
