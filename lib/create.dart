@@ -48,7 +48,7 @@ class _CreateState extends State<Create> {
         'username': user!.displayName,
         'title': _title.text.trim(),
         'contents': _content.text.trim(),
-        'tags': [university, department, _course.text.trim()],
+        'tags': [university, department, _course.text.trim().toUpperCase()],
         'date': DateTime.now(),
         'isEdited': false,
         'lastEdited': DateTime.now(),
@@ -227,7 +227,6 @@ class _CreateState extends State<Create> {
                       title: TextFormField(
                         maxLength: 8,
                         controller: _course,
-                        textCapitalization: TextCapitalization.characters,
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
                           TextInputFormatter.withFunction((oldValue, newValue) {

@@ -48,7 +48,7 @@ class _EditState extends State<Edit> {
       await FirebaseFirestore.instance.collection('blogs').doc(id).update({
         'title': _title.text.trim(),
         'contents': _content.text.trim(),
-        'tags': [university, department, _course.text.trim()],
+        'tags': [university, department, _course.text.trim().toUpperCase()],
         'isEdited': true,
         'lastEdited': DateTime.now(),
       });
@@ -237,8 +237,8 @@ class _EditState extends State<Edit> {
               
                     ListTile(
                       title: TextFormField(
+                        maxLength: 8,
                         controller: _course,
-                        textCapitalization: TextCapitalization.characters,
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
                           TextInputFormatter.withFunction((oldValue, newValue) {
