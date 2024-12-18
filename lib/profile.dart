@@ -433,7 +433,7 @@ class _ProfileState extends State<Profile> {
 
                     StreamBuilder(
                       stream: userStream,
-                      builder: (context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
+                      builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return const Center(
                             child: Padding(
