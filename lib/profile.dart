@@ -183,30 +183,30 @@ class _ProfileState extends State<Profile> {
     if (!mounted) return; // if page is closed
     if (user == null) return;
 
-    // cancel existing subscription if any
-    userStreamSubscription?.cancel();
+    try {
+      // cancel existing subscription if any
+      userStreamSubscription?.cancel();
 
-    // caching stream in variable so it doesnt refresh
-    userStream = FirebaseFirestore.instance.collection('users').doc(user!.uid).snapshots();
-    
-    // listen to user data from stream and update them
-    userStreamSubscription = userStream!.listen((snapshot) {
-      if (snapshot.exists && mounted) {
-        var data = snapshot.data()!;
+      // caching stream in variable so it doesnt refresh
+      userStream = FirebaseFirestore.instance.collection('users').doc(user!.uid).snapshots();
+      
+      // listen to user data from stream and update them
+      userStreamSubscription = userStream!.listen((snapshot) {
+        if (snapshot.exists && mounted) {
+          var data = snapshot.data()!;
 
-        setState(() {
-          _email.text = data['email'];
-          _username.text = data['username'];
-          _birthday.text = data['birthday'];
-          university = data['university'];
-          isAdmin = data['admin'];
-        });
-      }
-    },
-    onError: (error) {
+          setState(() {
+            _email.text = data['email'];
+            _username.text = data['username'];
+            _birthday.text = data['birthday'];
+            university = data['university'];
+            isAdmin = data['admin'];
+          });
+        }
+      });
+    } catch(error) {
       msg.failed(context, Icons.close, error, Colors.red);
     }
-    );
   }
 
   @override
