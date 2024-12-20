@@ -1,16 +1,5 @@
 # blogs
+A blogs app that supports markdown and favorites list.
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Setup
+If you want to run this app by yourself, you will have to setup a Fiebase dataset, and put the information on `.env` file rename the file on `assets` from `demo.env` to `.env` and fill the required information. Lastly run it from main.dart or `flutter run` on terminal.
