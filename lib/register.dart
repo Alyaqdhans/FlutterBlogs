@@ -214,8 +214,8 @@ class _RegisterState extends State<Register> {
                           alignment: const Alignment(0.65, 0),
                           child: IgnorePointer(
                             child: (passMatch)
-                            ? const Icon(Icons.check, color: Colors.green, size: 30)
-                            : const Icon(Icons.close, color: Colors.red, size: 30),
+                            ? const Icon(Icons.check, color: Colors.green)
+                            : const Icon(Icons.close, color: Colors.red),
                           ),
                         ),
                       ]
