@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:blogs/edit.dart';
 import 'package:blogs/function/messenger.dart';
+import 'package:blogs/search.dart';
 import 'package:blogs/widgets/preview.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -296,16 +297,40 @@ class _BlogCardState extends State<BlogCard> {
                                       spacing: 8,
                                       runSpacing: 4,
                                       children: tags.map((tag) {
-                                        return Chip(
-                                          label: Text(
-                                            tag,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 13,
+                                        return GestureDetector(
+                                          child: Chip(
+                                            label: Text(
+                                              tag,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 13,
+                                              ),
                                             ),
+                                            backgroundColor: Colors.teal,
+                                            side: BorderSide.none,
                                           ),
-                                          backgroundColor: Colors.teal,
-                                          side: BorderSide.none,
+                                          onTap: () {
+                                            // if on search page replace the page
+                                            bool isOnSearchPage = Navigator.canPop(context);
+                                            
+                                            if (isOnSearchPage) {
+                                              Navigator.pushReplacement(
+                                                context, 
+                                                MaterialPageRoute(builder: (context) => Search(
+                                                  filterName: tag,
+                                                  filterIndex: 3,
+                                                ))
+                                              );
+                                            } else {
+                                              Navigator.push(
+                                                context, 
+                                                MaterialPageRoute(builder: (context) => Search(
+                                                  filterName: tag,
+                                                  filterIndex: 3,
+                                                ))
+                                              );
+                                            }
+                                          },
                                         );
                                       }).toList(),
                                     ),

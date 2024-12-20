@@ -4,7 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import './widgets/blogcard.dart';
 
 class Search extends StatefulWidget {
-  const Search({super.key});
+  final int? filterIndex;
+  final String? filterName;
+  const Search({super.key, this.filterIndex, this.filterName});
 
   @override
   State<Search> createState() => _SearchState();
@@ -12,8 +14,8 @@ class Search extends StatefulWidget {
 
 class _SearchState extends State<Search> {
   final TextEditingController _search = TextEditingController();
-  int selectedFilterIndex = 0; // Track the selected filter index
-  String searchQuery = '';
+  int? selectedFilterIndex; // Track the selected filter index
+  String? searchQuery;
 
   // Build Firestore query based on selected filters
   Stream<QuerySnapshot<Map<String, dynamic>>> getSearchResults() {
@@ -48,6 +50,21 @@ class _SearchState extends State<Search> {
 
     // Return the final query stream
     return query.snapshots();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    selectedFilterIndex = widget.filterIndex ?? 0;
+    _search.text = widget.filterName ?? '';
+    searchQuery = widget.filterName ?? '';
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
   }
 
   @override
