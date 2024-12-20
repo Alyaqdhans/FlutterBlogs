@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:blogs/admin.dart';
 import 'package:blogs/function/dropdowndata.dart';
 import 'package:blogs/function/messenger.dart';
@@ -142,7 +144,7 @@ class _ProfileState extends State<Profile> {
       isSigningout = true;
     });
 
-    try {
+    try {      
       await Future.delayed(const Duration(milliseconds: 500));
       await FirebaseAuth.instance.signOut();
       
@@ -156,6 +158,9 @@ class _ProfileState extends State<Profile> {
         isSigningout = false;
         _password.text = "";
         isAdmin = null;
+        userStream = null;
+        userStreamSubscription?.cancel();
+        userStreamSubscription = null;
       });
     }
   }
@@ -166,21 +171,26 @@ class _ProfileState extends State<Profile> {
     _password.dispose();
     _username.dispose();
     _birthday.dispose();
+    userStreamSubscription?.cancel();
     super.dispose();
   }
 
   // moved stream outside builder so it only run once
   Stream<DocumentSnapshot<Map<String, dynamic>>>? userStream;
+  StreamSubscription? userStreamSubscription;
 
   Future getUserData() async {
     if (!mounted) return; // if page is closed
     if (user == null) return;
 
+    // cancel existing subscription if any
+    userStreamSubscription?.cancel();
+
     // caching stream in variable so it doesnt refresh
     userStream = FirebaseFirestore.instance.collection('users').doc(user!.uid).snapshots();
     
     // listen to user data from stream and update them
-    userStream!.listen((snapshot) {
+    userStreamSubscription = userStream!.listen((snapshot) {
       if (snapshot.exists && mounted) {
         var data = snapshot.data()!;
 
@@ -192,7 +202,11 @@ class _ProfileState extends State<Profile> {
           isAdmin = data['admin'];
         });
       }
-    });
+    },
+    onError: (error) {
+      msg.failed(context, Icons.close, error, Colors.red);
+    }
+    );
   }
 
   @override

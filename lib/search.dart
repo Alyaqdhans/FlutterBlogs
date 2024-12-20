@@ -1,7 +1,7 @@
 import 'package:blogs/widgets/errors/spinner.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import './widgets/blogcard.dart';
+import 'package:blogs/widgets/blogcard.dart';
 
 class Search extends StatefulWidget {
   final int? filterIndex;
@@ -162,7 +162,7 @@ class _SearchState extends State<Search> {
                         children: [
                           Icon(
                             Icons.search,
-                            size: 100,
+                            size: 70,
                             color: Colors.grey,
                           ),
                       
@@ -170,9 +170,10 @@ class _SearchState extends State<Search> {
                             'Search to get started',
                             style: TextStyle(
                               color: Colors.grey,
-                              fontSize: 40,
+                              fontSize: 30,
                               fontWeight: FontWeight.bold
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ],
                       ),
@@ -189,7 +190,7 @@ class _SearchState extends State<Search> {
                         children: [
                           Icon(
                             Icons.search_off,
-                            size: 100,
+                            size: 70,
                             color: Colors.blue,
                           ),
                       
@@ -197,9 +198,10 @@ class _SearchState extends State<Search> {
                             'No results were found',
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 40,
+                              fontSize: 30,
                               fontWeight: FontWeight.bold
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ],
                       ),

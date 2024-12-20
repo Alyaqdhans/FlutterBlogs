@@ -28,6 +28,7 @@ class _RegisterState extends State<Register> {
 
   bool hidePassword = true;
   bool hideConfirm = true;
+  bool passMatch = false;
 
   bool isLoading = false;
   
@@ -143,14 +144,19 @@ class _RegisterState extends State<Register> {
                             obscureText: hidePassword,
                             controller: _password,
                             decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.lock),
+                              prefixIcon: const Icon(Icons.lock_outlined),
                               labelText: 'Password',
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                             ),
+                            onChanged: (value) {
+                              setState(() {
+                                passMatch = _password.text.trim() == _confirm.text.trim() && _password.text.trim().isNotEmpty;
+                              });
+                            },
                           ),
                         ),
 
-                        Container(
+                        Align(
                           alignment: const Alignment(0.85, 0),
                           child: Focus(
                             descendantsAreFocusable: false,
@@ -180,10 +186,15 @@ class _RegisterState extends State<Register> {
                               labelText: 'Confirm Password',
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                             ),
+                            onChanged: (value) {
+                              setState(() {
+                                passMatch = _password.text.trim() == _confirm.text.trim() && _password.text.trim().isNotEmpty;
+                              });
+                            },
                           ),
                         ),
 
-                        Container(
+                        Align(
                           alignment: const Alignment(0.85, 0),
                           child: Focus(
                             descendantsAreFocusable: false,
@@ -196,6 +207,15 @@ class _RegisterState extends State<Register> {
                               },
                               icon: Icon((hideConfirm ? Icons.visibility_off : Icons.visibility), color: Colors.blue)
                             ),
+                          ),
+                        ),
+
+                        Align(
+                          alignment: const Alignment(0.65, 0),
+                          child: IgnorePointer(
+                            child: (passMatch)
+                            ? const Icon(Icons.check, color: Colors.green, size: 30)
+                            : const Icon(Icons.close, color: Colors.red, size: 30),
                           ),
                         ),
                       ]
